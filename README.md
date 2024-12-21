@@ -201,6 +201,11 @@ Currently supported formats from SDR vendors:
 - RTLSDR: 8-bit (uint8_t), 16-bit (with automatic conversion)
 - AIRSPY: 16-bit (int16_t), 32-bit (float)
 
+## Goals 
+- Add more automatic type converters for different SDR devices.
+- Maybe use libvolk optionally for SIMD optimizations of automatic converters.
+- Add more SDR vendors support.
+
 ## Remarks
 
 This library was created to be used in my projects.
