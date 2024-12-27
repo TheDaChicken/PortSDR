@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -19,7 +20,7 @@ namespace PortSDR
         std::string serial;
         uint64_t index;
 
-        int CreateStream(std::shared_ptr<Stream>& stream) const;
+        int CreateStream(std::unique_ptr<Stream>& stream) const;
     };
 
     struct Range
@@ -121,11 +122,11 @@ namespace PortSDR
         PortSDR();
 
         std::vector<std::shared_ptr<Host>> GetHosts();
-        std::vector<std::shared_ptr<Device>> GetDevices();
+        std::vector<Device> GetDevices();
 
         std::shared_ptr<Host> FindHost(std::string_view name);
 
-        std::shared_ptr<Device> GetFirstAvailableSDR();
+        std::optional<Device> GetFirstAvailableSDR();
     };
 
     class Stream
@@ -136,7 +137,7 @@ namespace PortSDR
         Stream() = default;
         virtual ~Stream() = default;
 
-        virtual int Initialize(const std::shared_ptr<Device>& device) = 0;
+        virtual int Initialize(const Device& device) = 0;
 
         virtual int Start() = 0;
         virtual int Stop() = 0;
@@ -177,11 +178,11 @@ namespace PortSDR
 
         virtual void RefreshDevices() = 0;
 
-        [[nodiscard]] virtual std::vector<std::shared_ptr<Device>> Devices() const = 0;
-        [[nodiscard]] virtual std::shared_ptr<Stream> CreateStream() const = 0;
+        [[nodiscard]] virtual const std::vector<Device>& Devices() const = 0;
+        [[nodiscard]] virtual std::unique_ptr<Stream> CreateStream() const = 0;
 
-        int CreateAndInitializeStream(const std::shared_ptr<Device>& device,
-                                      std::shared_ptr<Stream>& stream) const
+        int CreateAndInitializeStream(const Device& device,
+                                      std::unique_ptr<Stream>& stream) const
         {
             auto newStream = CreateStream();
             const int ret = newStream->Initialize(device);

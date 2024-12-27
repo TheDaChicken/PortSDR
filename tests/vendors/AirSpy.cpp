@@ -23,7 +23,7 @@ TEST(AirSpy, Devices)
 
     for (const auto& device : devices)
     {
-        std::cout << device->name << std::endl;
+        std::cout << device.name << std::endl;
     }
 }
 
@@ -34,7 +34,7 @@ TEST(AirSpy, Stream)
 
     ASSERT_TRUE(sdrHost);
 
-    const std::vector<std::shared_ptr<PortSDR::Device>> devices = sdrHost->Devices();
+    const std::vector<PortSDR::Device>& devices = sdrHost->Devices();
 
     ASSERT_TRUE(!devices.empty());
 

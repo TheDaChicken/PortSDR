@@ -8,6 +8,8 @@
 #include "PortSDR.h"
 #include "rtl-sdr.h"
 
+#include <thread>
+
 namespace PortSDR
 {
     class RTLHost final : public Host
@@ -17,11 +19,11 @@ namespace PortSDR
 
         void RefreshDevices() override;
 
-        [[nodiscard]] std::vector<std::shared_ptr<Device>> Devices() const override;
-        [[nodiscard]] std::shared_ptr<Stream> CreateStream() const override;
+        [[nodiscard]] const std::vector<Device>& Devices() const override;
+        [[nodiscard]] std::unique_ptr<Stream> CreateStream() const override;
 
     private:
-        std::vector<std::shared_ptr<Device>> devices_;
+        std::vector<Device> devices_;
     };
 
     class RTLStream final : public Stream
@@ -29,7 +31,7 @@ namespace PortSDR
     public:
         ~RTLStream() override;
 
-        int Initialize(const std::shared_ptr<Device>& device) override;
+        int Initialize(const Device& device) override;
         int Start() override;
         int Stop() override;
 

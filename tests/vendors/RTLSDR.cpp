@@ -15,7 +15,7 @@ TEST(RTLSDR, Devices)
 
     ASSERT_TRUE(sdrHost);
 
-    const std::vector<std::shared_ptr<PortSDR::Device>> devices = sdrHost->Devices();
+    const std::vector<PortSDR::Device>& devices = sdrHost->Devices();
 
     ASSERT_FALSE(devices.empty()) << "No devices found";
 
@@ -25,7 +25,7 @@ TEST(RTLSDR, Devices)
 
     for (const auto& device : devices)
     {
-        std::cout << device->name << std::endl;
+        std::cout << device.name << std::endl;
     }
 }
 
@@ -36,7 +36,7 @@ TEST(RTLSDR, Stream)
 
     ASSERT_TRUE(sdrHost);
 
-    const std::vector<std::shared_ptr<PortSDR::Device>> devices = sdrHost->Devices();
+    const std::vector<PortSDR::Device>& devices = sdrHost->Devices();
 
     ASSERT_TRUE(!devices.empty());
 

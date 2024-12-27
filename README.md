@@ -55,8 +55,8 @@ int main()
     PortSDR::PortSDR sdr;
 
     // Get the first available SDR device
-    std::shared_ptr<PortSDR::Device> device = sdr.GetFirstAvailableSDR();
-    if (device == nullptr)
+    const std::optional<PortSDR::Device> device = sdr.GetFirstAvailableSDR();
+    if (!device.has_value())
     {
         std::cerr << "There are no devices" << std::endl;
         return 1;
@@ -66,7 +66,7 @@ int main()
     std::cout << "Serial: " << device->serial << std::endl;
     
     // Open the stream from the device
-    std::shared_ptr<PortSDR::Stream> stream;
+    std::unique_ptr<PortSDR::Stream> stream;
     
     int ret = device->CreateStream(stream);
     if (ret != 0)
@@ -98,10 +98,15 @@ int main()
     PortSDR::PortSDR sdr;
     
     // Get the first available SDR device
-    std::shared_ptr<PortSDR::Device> device = sdr.GetFirstAvailableSDR();
+    const std::optional<PortSDR::Device> device = sdr.GetFirstAvailableSDR();
+    if (!device.has_value())
+    {
+        std::cerr << "There are no devices" << std::endl;
+        return 1;
+    }
     
     // Open the device
-    std::shared_ptr<PortSDR::Stream> stream;
+    std::unique_ptr<PortSDR::Stream> stream;
     
     int ret = device->CreateStream(stream);
     if (ret != 0)
@@ -119,7 +124,7 @@ int main()
     std::cout << std::endl;
     
     std::cout << "Gains: ";
-    for (auto gain : stream->GetGainRanges())
+    for (const auto& gain : stream->GetGainRanges())
     {
         std::cout << gain.stage << " ";
         std::cout << gain.range.min() << " ";
@@ -152,7 +157,7 @@ For AirSpy Mini/R2 devices gain modes:
 int main()
 {
     // Open the device
-    std::shared_ptr<PortSDR::Stream> stream = device->CreateStream();
+    std::unique_ptr<PortSDR::Stream> stream = device->CreateStream();
     
     // Set callback
     stream->SetCallback([](const void *buffer, std::size_t elements)
@@ -190,7 +195,7 @@ This library contains automatic converters to convert the samples to any format 
 // ... Get the device 
 
 // Open the device
-std::shared_ptr<PortSDR::Stream> stream = device->CreateStream();
+std::unique_ptr<PortSDR::Stream> stream = device->CreateStream();
 
 // Set the sample format to 16-bit
 stream->SetSampleFormat(PortSDR::SAMPLE_FORMAT_INT16);

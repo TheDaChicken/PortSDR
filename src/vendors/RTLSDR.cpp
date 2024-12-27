@@ -41,31 +41,30 @@ void PortSDR::RTLHost::RefreshDevices()
         memset(product, 0, sizeof(product));
         memset(serial, 0, sizeof(serial));
 
-        devices_[i] = std::make_shared<Device>();
-        devices_[i]->index = i;
-        devices_[i]->host = this;
-        devices_[i]->serial.clear();
+        devices_[i].index = i;
+        devices_[i].host = this;
+        devices_[i].serial.clear();
 
         if (rtlsdr_get_device_usb_strings(i, manufact, product, serial) == 0)
         {
-            devices_[i]->serial = serial;
-            devices_[i]->name = string_format("%s %s SN: %s", manufact, product, serial);
+            devices_[i].serial = serial;
+            devices_[i].name = string_format("%s %s SN: %s", manufact, product, serial);
         }
         else
         {
-            devices_[i]->name = rtlsdr_get_device_name(device_count);
+            devices_[i].name = rtlsdr_get_device_name(device_count);
         }
     }
 }
 
-std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::RTLHost::Devices() const
+const std::vector<PortSDR::Device>& PortSDR::RTLHost::Devices() const
 {
     return devices_;
 }
 
-std::shared_ptr<PortSDR::Stream> PortSDR::RTLHost::CreateStream() const
+std::unique_ptr<PortSDR::Stream> PortSDR::RTLHost::CreateStream() const
 {
-    return std::make_shared<RTLStream>();
+    return std::make_unique<RTLStream>();
 }
 
 PortSDR::RTLStream::~RTLStream()
@@ -79,14 +78,14 @@ PortSDR::RTLStream::~RTLStream()
     m_dev = nullptr;
 }
 
-int PortSDR::RTLStream::Initialize(const std::shared_ptr<Device>& device)
+int PortSDR::RTLStream::Initialize(const Device& device)
 {
     int ret = 0;
 
     if (m_dev)
         return ret;
 
-    ret = rtlsdr_open(&m_dev, device->index);
+    ret = rtlsdr_open(&m_dev, device.index);
     if (ret < 0)
         return ret;
 
