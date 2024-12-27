@@ -1,4 +1,6 @@
-find_package(LIBAIRSPY)
+if (NOT LIBAIRSPY_FOUND)
+    find_package(LIBAIRSPY)
+endif()
 
 if (NOT LIBAIRSPY_FOUND)
     message(STATUS "Building LIBAIRSPY from source.")
