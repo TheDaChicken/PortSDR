@@ -10,17 +10,17 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 include(GoogleTest)
 
-add_executable(Tests
+add_executable(PortSDR_Tests
         vendors/RTLSDR.cpp
         vendors/AirSpy.cpp
         AnyTests.cpp
 )
 
-target_link_libraries(Tests PRIVATE
+target_link_libraries(PortSDR_Tests PRIVATE
         PortSDR
         gtest
         gtest_main
         gmock
 )
 
-gtest_discover_tests(Tests)
+gtest_discover_tests(PortSDR_Tests)
