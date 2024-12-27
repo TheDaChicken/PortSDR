@@ -30,27 +30,28 @@ void PortSDR::AirSpyHost::RefreshDevices()
         uint8_t board_id;
         airspy_read_partid_serialno_t read_partid_serialno;
 
-        devices_[i].index = serials[i];
-        devices_[i].serial.clear();
-        devices_[i].name = "AIRSPY";
-        devices_[i].host = this;
+        devices_[i] = std::make_shared<Device>();
+        devices_[i]->index = serials[i];
+        devices_[i]->serial.clear();
+        devices_[i]->name = "AIRSPY";
+        devices_[i]->host = this;
 
         if (airspy_open_sn(&dev, serials[i]) == AIRSPY_SUCCESS)
         {
             if (airspy_board_id_read(dev, &board_id) == AIRSPY_SUCCESS)
             {
-                devices_[i].name = airspy_board_id_name(static_cast<airspy_board_id>(board_id));
+                devices_[i]->name = airspy_board_id_name(static_cast<airspy_board_id>(board_id));
             }
 
             if (airspy_board_partid_serialno_read(dev, &read_partid_serialno) == AIRSPY_SUCCESS)
             {
-                devices_[i].serial = string_format("%08X%08X",
+                devices_[i]->serial = string_format("%08X%08X",
                                                     read_partid_serialno.serial_no[2],
                                                     read_partid_serialno.serial_no[3]);
 
                 // FIXME: Why is .c_str() / .data() needed here?
                 // If not, the string memory is messed up.
-                devices_[i].name += string_format(" SN: %s", devices_[i].serial.c_str());
+                devices_[i]->name += string_format(" SN: %s", devices_[i]->serial.c_str());
             }
 
             airspy_close(dev);
@@ -58,7 +59,7 @@ void PortSDR::AirSpyHost::RefreshDevices()
     }
 }
 
-const std::vector<PortSDR::Device>& PortSDR::AirSpyHost::Devices() const
+const std::vector<std::shared_ptr<PortSDR::Device>>& PortSDR::AirSpyHost::Devices() const
 {
     return devices_;
 }
@@ -76,12 +77,12 @@ PortSDR::AirSpyStream::~AirSpyStream()
     }
 }
 
-int PortSDR::AirSpyStream::Initialize(const Device& device)
+int PortSDR::AirSpyStream::Initialize(const std::shared_ptr<Device>& device)
 {
     if (m_device)
         return 0;
 
-    int ret = airspy_open_sn(&m_device, device.index);
+    int ret = airspy_open_sn(&m_device, device->index);
     if (ret != AIRSPY_SUCCESS)
     {
         return ret;

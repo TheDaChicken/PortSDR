@@ -17,18 +17,19 @@ namespace PortSDR
 
         void RefreshDevices() override;
 
-        [[nodiscard]] const std::vector<Device>& Devices() const override;
+        [[nodiscard]] const std::vector<std::shared_ptr<Device>>& Devices() const override;
         [[nodiscard]] std::unique_ptr<Stream> CreateStream() const override;
 
     private:
-        std::vector<Device> devices_;
+        std::vector<std::shared_ptr<Device>> devices_;
     };
 
     class AirSpyStream final : public Stream
     {
     public:
         ~AirSpyStream() override;
-        int Initialize(const Device& device) override;
+
+        int Initialize(const std::shared_ptr<Device>& device) override;
 
         int Start() override;
         int Stop() override;

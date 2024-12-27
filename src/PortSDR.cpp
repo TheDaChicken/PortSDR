@@ -52,11 +52,11 @@ std::shared_ptr<PortSDR::Host> PortSDR::PortSDR::FindHost(std::string_view name)
     return {};
 }
 
-std::optional<PortSDR::Device> PortSDR::PortSDR::GetFirstAvailableSDR()
+std::shared_ptr<PortSDR::Device> PortSDR::PortSDR::GetFirstAvailableSDR()
 {
     for (const auto& host : m_hosts)
     {
-        const std::vector<Device>& devices = host->Devices();
+        const std::vector<std::shared_ptr<Device>>& devices = host->Devices();
         if (!devices.empty())
         {
             return devices.front();
@@ -65,12 +65,12 @@ std::optional<PortSDR::Device> PortSDR::PortSDR::GetFirstAvailableSDR()
     return {};
 }
 
-std::vector<PortSDR::Device> PortSDR::PortSDR::GetDevices()
+std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::PortSDR::GetDevices()
 {
-    std::vector<Device> devices;
+    std::vector<std::shared_ptr<Device>> devices;
     for (const auto& host : m_hosts)
     {
-        const std::vector<Device>& host_devices = host->Devices();
+        const std::vector<std::shared_ptr<Device>>& host_devices = host->Devices();
         devices.insert(devices.end(), host_devices.begin(), host_devices.end());
     }
 
@@ -102,7 +102,7 @@ int PortSDR::Device::CreateStream(std::unique_ptr<Stream>& stream) const
     if (!host)
         return {};
 
-    return host->CreateAndInitializeStream(*this, stream);
+    return host->CreateAndInitializeStream(std::make_unique<Device>(*this), stream);
 }
 
 double PortSDR::MetaRange::step() const

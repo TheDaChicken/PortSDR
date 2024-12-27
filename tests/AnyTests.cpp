@@ -10,7 +10,7 @@ TEST(AnyTest, Stream)
     PortSDR::PortSDR sdr;
 
     // Get the first available SDR device
-    const std::optional<PortSDR::Device> device = sdr.GetFirstAvailableSDR();
+    const std::shared_ptr<PortSDR::Device> device = sdr.GetFirstAvailableSDR();
 
     ASSERT_TRUE(device) << "No devices found";
 

@@ -55,8 +55,8 @@ int main()
     PortSDR::PortSDR sdr;
 
     // Get the first available SDR device
-    const std::optional<PortSDR::Device> device = sdr.GetFirstAvailableSDR();
-    if (!device.has_value())
+    const std::shared_ptr<PortSDR::Device> device = sdr.GetFirstAvailableSDR();
+    if (!device)
     {
         std::cerr << "There are no devices" << std::endl;
         return 1;
@@ -98,8 +98,8 @@ int main()
     PortSDR::PortSDR sdr;
     
     // Get the first available SDR device
-    const std::optional<PortSDR::Device> device = sdr.GetFirstAvailableSDR();
-    if (!device.has_value())
+    const std::shared_ptr<PortSDR::Device> device = sdr.GetFirstAvailableSDR();
+    if (!device)
     {
         std::cerr << "There are no devices" << std::endl;
         return 1;
