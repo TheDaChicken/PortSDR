@@ -24,8 +24,8 @@ add_library(${PortSDR_LIBRARY_NAME}
         ${PortSDR_VENDOR_FILES}
 )
 
-target_include_directories(${PortSDR_LIBRARY_NAME} PUBLIC ${CMAKE_SOURCE_DIR}/include)
-target_include_directories(${PortSDR_LIBRARY_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src)
+target_include_directories(${PortSDR_LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+target_include_directories(${PortSDR_LIBRARY_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(${PortSDR_LIBRARY_NAME} PRIVATE "${CMAKE_BINARY_DIR}")
 
 set_target_properties(${PortSDR_LIBRARY_NAME} PROPERTIES PUBLIC_HEADER ${PortSDR_PUBLIC_HEADER})
