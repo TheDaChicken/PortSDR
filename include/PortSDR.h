@@ -154,12 +154,13 @@ namespace PortSDR
         virtual std::vector<std::string> GetGainModes() const = 0;
         virtual std::vector<SampleFormat> GetSampleFormats() const = 0;
 
-        [[nodiscard]] virtual Gain GetGainRange() const = 0;
-        [[nodiscard]] virtual std::vector<Gain> GetGainRanges() const = 0;
+        [[nodiscard]] virtual Gain GetGainStage() const = 0;
+        [[nodiscard]] virtual std::vector<Gain> GetGainStages() const = 0;
 
         [[nodiscard]] virtual uint32_t GetCenterFrequency() const = 0;
         [[nodiscard]] virtual uint32_t GetSampleRate() const = 0;
         [[nodiscard]] virtual int GetGain() const = 0;
+        [[nodiscard]] virtual const std::string GetGainMode() const = 0;
 
         int SetCallback(SDR_CALLBACK sdr_callback)
         {

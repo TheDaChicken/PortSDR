@@ -59,7 +59,7 @@ TEST(AirSpy, Stream)
     ASSERT_EQ(stream->Start(), 0) << "Failed to start stream";
 
     // Test Gain
-    const auto gainRange = stream->GetGainRange();
+    const auto gainRange = stream->GetGainStage();
 
     ASSERT_EQ(stream->SetGain(gainRange.range.min()), 0) << "Failed to set gain";
     ASSERT_EQ(stream->SetGain(gainRange.range.max()), 0) << "Failed to set gain";

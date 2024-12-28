@@ -52,9 +52,10 @@ namespace PortSDR
         [[nodiscard]] uint32_t GetCenterFrequency() const override;
         [[nodiscard]] uint32_t GetSampleRate() const override;
         [[nodiscard]] int GetGain() const override;
+        [[nodiscard]] const std::string GetGainMode() const override;
 
-        [[nodiscard]] Gain GetGainRange() const override;
-        [[nodiscard]] std::vector<Gain> GetGainRanges() const override;
+        [[nodiscard]] Gain GetGainStage() const override;
+        [[nodiscard]] std::vector<Gain> GetGainStages() const override;
 
     private:
         static void RTLSDRCallback(unsigned char* buf, uint32_t len, void* ctx);

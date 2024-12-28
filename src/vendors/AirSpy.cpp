@@ -276,12 +276,12 @@ std::vector<std::string> PortSDR::AirSpyStream::GetGainModes() const
     return {"LINEARITY", "SENSITIVITY"};
 }
 
-PortSDR::Gain PortSDR::AirSpyStream::GetGainRange() const
+PortSDR::Gain PortSDR::AirSpyStream::GetGainStage() const
 {
     return {"Gain", MetaRange(0, 21, 1)};
 }
 
-std::vector<PortSDR::Gain> PortSDR::AirSpyStream::GetGainRanges() const
+std::vector<PortSDR::Gain> PortSDR::AirSpyStream::GetGainStages() const
 {
     std::vector<Gain> ranges;
 
@@ -310,6 +310,11 @@ uint32_t PortSDR::AirSpyStream::GetSampleRate() const
 int PortSDR::AirSpyStream::GetGain() const
 {
     return m_gain;
+}
+
+const std::string PortSDR::AirSpyStream::GetGainMode() const
+{
+    return m_gainMode == LINEARITY ? "LINEARITY" : "SENSITIVITY";
 }
 
 int PortSDR::AirSpyStream::AirSpySDRCallback(airspy_transfer* transfer)

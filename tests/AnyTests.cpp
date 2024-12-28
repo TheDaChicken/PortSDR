@@ -36,7 +36,7 @@ TEST(AnyTest, Stream)
     std::cout << std::endl;
 
     std::cout << "Gains: ";
-    for (const auto& gain : stream->GetGainRanges())
+    for (const auto& gain : stream->GetGainStages())
     {
         std::cout << gain.stage << " ";
         std::cout << gain.range.min() << " ";

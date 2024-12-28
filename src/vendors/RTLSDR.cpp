@@ -265,7 +265,12 @@ int PortSDR::RTLStream::GetGain() const
     return rtlsdr_get_tuner_gain(m_dev);
 }
 
-PortSDR::Gain PortSDR::RTLStream::GetGainRange() const
+const std::string PortSDR::RTLStream::GetGainMode() const
+{
+    return "";
+}
+
+PortSDR::Gain PortSDR::RTLStream::GetGainStage() const
 {
     MetaRange range;
 
@@ -287,7 +292,7 @@ PortSDR::Gain PortSDR::RTLStream::GetGainRange() const
     return {"LNA", range};
 }
 
-std::vector<PortSDR::Gain> PortSDR::RTLStream::GetGainRanges() const
+std::vector<PortSDR::Gain> PortSDR::RTLStream::GetGainStages() const
 {
     std::vector<Gain> gains;
 
@@ -296,7 +301,7 @@ std::vector<PortSDR::Gain> PortSDR::RTLStream::GetGainRanges() const
         gains.emplace_back("IF", MetaRange{3, 56, 1});
     }
 
-    gains.emplace_back(GetGainRange());
+    gains.emplace_back(GetGainStage());
     return gains;
 }
 
