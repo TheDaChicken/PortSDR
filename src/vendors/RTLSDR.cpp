@@ -220,8 +220,7 @@ int PortSDR::RTLStream::SetGain(int gain, std::string_view name)
     {
         return SetIfGain(gain);
     }
-
-    if ("REGULAR" == name)
+    if ("LNA" == name)
     {
         return SetGain(gain);
     }
