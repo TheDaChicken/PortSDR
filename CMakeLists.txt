@@ -14,7 +14,7 @@ set(PortSDR_VERSION_MAJOR 1)
 set(PortSDR_VERSION_MINOR 0)
 set(PortSDR_VERSION_PATCH 0)
 
-set(PortSDR_PUBLIC_HEADER include/library.h)
+set(PortSDR_PUBLIC_HEADER include/PortSDR.h)
 
 include(ExternalProject)
 include(FetchContent)
