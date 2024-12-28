@@ -224,12 +224,6 @@ int PortSDR::AirSpyStream::SetGain(int gain, std::string_view name)
     {
         return SetIfGain(gain);
     }
-
-    if ("REGULAR" == name)
-    {
-        return SetGain(gain);
-    }
-
     return -1;
 }
 
