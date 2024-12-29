@@ -5,7 +5,7 @@ if (RTLSDR_FOUND)
             ${CMAKE_CURRENT_SOURCE_DIR}/../include/RTLSDR.h
             vendors/RTLSDR.cpp
     )
-    list(APPEND PortSDR_LIBRARIES RTLSDR::RTLSDR)
+    list(APPEND PortSDR_LIBRARIES rtlsdr::rtlsdr_static)
 endif ()
 
 if (LIBAIRSPY_FOUND)
@@ -13,7 +13,7 @@ if (LIBAIRSPY_FOUND)
             ${CMAKE_CURRENT_SOURCE_DIR}/../include/AirSpy.h
             vendors/AirSpy.cpp
     )
-    list(APPEND PortSDR_LIBRARIES LIBAIRSPY::LIBAIRSPY)
+    list(APPEND PortSDR_LIBRARIES libairspy::libairspy)
 endif ()
 
 add_library(${PortSDR_LIBRARY_NAME}

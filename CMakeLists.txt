@@ -22,8 +22,7 @@ project(PortSDR VERSION ${PortSDR_VERSION_MAJOR}.${PortSDR_VERSION_MINOR}.${Port
 if (LIBRARY_BUILD_SHARED)
     set(LIBRARY_BUILD_TYPE SHARED)
 else ()
-    set(LIBRARY_BUILD_TYPE STATIC
-    )
+    set(LIBRARY_BUILD_TYPE STATIC)
 endif ()
 
 include(cmake/CheckVersion.cmake)

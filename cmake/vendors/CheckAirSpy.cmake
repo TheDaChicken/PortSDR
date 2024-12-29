@@ -32,14 +32,15 @@ if (NOT LIBAIRSPY_FOUND)
     )
     file(MAKE_DIRECTORY ${LIBAIRSPY_INCLUDE_DIR})
 
-    add_library(LIBAIRSPY::LIBAIRSPY INTERFACE IMPORTED GLOBAL)
-    set_target_properties(LIBAIRSPY::LIBAIRSPY PROPERTIES
+    add_library(libairspy::libairspy INTERFACE IMPORTED GLOBAL)
+    set_target_properties(libairspy::libairspy PROPERTIES
             INTERFACE_INCLUDE_DIRECTORIES "${LIBAIRSPY_INCLUDE_DIR}"
             INTERFACE_LINK_LIBRARIES "${LIBAIRSPY_LIBRARIES}"
     )
-    target_link_libraries(LIBAIRSPY::LIBAIRSPY INTERFACE LIBUSB::LIBUSB)
-    add_dependencies (LIBAIRSPY::LIBAIRSPY LibAirSpyExternal)
+    target_link_libraries(libairspy::libairspy INTERFACE libusb::libusb)
 
-    list(APPEND PortSDR_DEPENDENCIES LIBAIRSPY::LIBAIRSPY)
+    add_dependencies (libairspy::libairspy LibAirSpyExternal)
+
+    list(APPEND PortSDR_DEPENDENCIES libairspy::libairspy)
     set(LIBAIRSPY_FOUND TRUE)
 endif()

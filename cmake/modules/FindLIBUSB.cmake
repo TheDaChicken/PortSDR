@@ -22,8 +22,8 @@ find_library(LIBUSB_LIBRARIES
 find_package_handle_standard_args(LIBUSB DEFAULT_MSG LIBUSB_INCLUDE_DIR LIBUSB_LIBRARIES)
 
 if (LIBUSB_FOUND)
-    add_library(LIBUSB::LIBUSB INTERFACE IMPORTED)
-    set_target_properties(LIBUSB::LIBUSB PROPERTIES
+    add_library(libusb::libusb INTERFACE IMPORTED)
+    set_target_properties(libusb::libusb PROPERTIES
             INTERFACE_INCLUDE_DIRECTORIES "${LIBUSB_INCLUDE_DIR}"
             INTERFACE_LINK_LIBRARIES "${LIBUSB_LIBRARIES}"
     )
