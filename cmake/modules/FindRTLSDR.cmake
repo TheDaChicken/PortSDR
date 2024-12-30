@@ -15,19 +15,13 @@ find_path(RTLSDR_INCLUDE_DIR
         DOC "RTLSDR include directory"
 )
 find_library(RTLSDR_LIBRARIES
-        NAMES librtlsdr rtlsdr
+        NAMES librtlsdr_static librtlsdr rtlsdr
         PATHS ${PC_RTLSDR_LIBDIR}
-        DOC "RTLSDR library location"
-)
-find_library(RTLSDR_STATIC_LIBRARIES
-        NAMES librtlsdr_static
-        PATHS ${PC_RTLSDR_LIBDIR}
-        PATH_SUFFIXES lib
         DOC "RTLSDR library location"
 )
 
 find_package_handle_standard_args(RTLSDR DEFAULT_MSG
-        RTLSDR_INCLUDE_DIR RTLSDR_LIBRARIES RTLSDR_STATIC_LIBRARIES
+        RTLSDR_INCLUDE_DIR RTLSDR_LIBRARIES
 )
 
 if (RTLSDR_FOUND)
@@ -37,13 +31,6 @@ if (RTLSDR_FOUND)
             INTERFACE_LINK_LIBRARIES "${RTLSDR_LIBRARIES}"
     )
     target_link_libraries(rtlsdr::rtlsdr INTERFACE libusb::libusb)
-
-    add_library(rtlsdr::rtlsdr_static INTERFACE IMPORTED)
-    set_target_properties(rtlsdr::rtlsdr_static PROPERTIES
-            INTERFACE_INCLUDE_DIRECTORIES "${RTLSDR_INCLUDE_DIR}"
-            INTERFACE_LINK_LIBRARIES "${RTLSDR_STATIC_LIBRARIES}"
-    )
-    target_link_libraries(rtlsdr::rtlsdr_static INTERFACE libusb::libusb)
 
     mark_as_advanced(
             RTLSDR_LIBRARIES
