@@ -47,14 +47,6 @@ void PortSDR::RTLHost::RefreshDevices()
         devices_[i]->serial.clear();
         devices_[i]->unavailable = false;
 
-        // Check if the device is available
-        rtlsdr_dev_t *dev = nullptr;
-        if (rtlsdr_open(&dev, i) != 0)
-        {
-            devices_[i]->unavailable = true;
-            continue;
-        }
-
         if (rtlsdr_get_device_usb_strings(i, manufact, product, serial) == 0)
         {
             devices_[i]->serial = serial;
@@ -63,9 +55,12 @@ void PortSDR::RTLHost::RefreshDevices()
         else
         {
             devices_[i]->name = rtlsdr_get_device_name(device_count);
-        }
 
-        rtlsdr_close(dev);
+            if (devices_[i]->name == "")
+            {
+                devices_[i]->unavailable = true;
+            }
+        }
     }
 }
 
