@@ -20,6 +20,8 @@ namespace PortSDR
         std::string serial;
         uint64_t index;
 
+        bool unavailable;
+
         int CreateStream(std::unique_ptr<Stream>& stream) const;
     };
 

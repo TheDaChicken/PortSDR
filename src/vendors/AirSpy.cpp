@@ -35,27 +35,31 @@ void PortSDR::AirSpyHost::RefreshDevices()
         devices_[i]->serial.clear();
         devices_[i]->name = "AIRSPY";
         devices_[i]->host = this;
+        devices_[i]->unavailable = false;
 
-        if (airspy_open_sn(&dev, serials[i]) == AIRSPY_SUCCESS)
+        if (airspy_open_sn(&dev, serials[i]) != AIRSPY_SUCCESS)
         {
-            if (airspy_board_id_read(dev, &board_id) == AIRSPY_SUCCESS)
-            {
-                devices_[i]->name = airspy_board_id_name(static_cast<airspy_board_id>(board_id));
-            }
-
-            if (airspy_board_partid_serialno_read(dev, &read_partid_serialno) == AIRSPY_SUCCESS)
-            {
-                devices_[i]->serial = string_format("%08X%08X",
-                                                    read_partid_serialno.serial_no[2],
-                                                    read_partid_serialno.serial_no[3]);
-
-                // FIXME: Why is .c_str() / .data() needed here?
-                // If not, the string memory is messed up.
-                devices_[i]->name += string_format(" SN: %s", devices_[i]->serial.c_str());
-            }
-
-            airspy_close(dev);
+            devices_[i]->unavailable = true;
+            continue;
         }
+
+        if (airspy_board_id_read(dev, &board_id) == AIRSPY_SUCCESS)
+        {
+            devices_[i]->name = airspy_board_id_name(static_cast<airspy_board_id>(board_id));
+        }
+
+        if (airspy_board_partid_serialno_read(dev, &read_partid_serialno) == AIRSPY_SUCCESS)
+        {
+            devices_[i]->serial = string_format("%08X%08X",
+                                                read_partid_serialno.serial_no[2],
+                                                read_partid_serialno.serial_no[3]);
+
+            // FIXME: Why is .c_str() / .data() needed here?
+            // If not, the string memory is messed up.
+            devices_[i]->name += string_format(" SN: %s", devices_[i]->serial.c_str());
+        }
+
+        airspy_close(dev);
     }
 }
 
