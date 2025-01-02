@@ -40,6 +40,7 @@ void PortSDR::AirSpyHost::RefreshDevices()
         if (airspy_open_sn(&dev, serials[i]) != AIRSPY_SUCCESS)
         {
             devices_[i]->unavailable = true;
+            devices_[i]->name += " (Unavailable)";
             continue;
         }
 

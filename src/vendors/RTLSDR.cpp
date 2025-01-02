@@ -58,6 +58,7 @@ void PortSDR::RTLHost::RefreshDevices()
 
             if (devices_[i]->name == "")
             {
+                devices_[i]->name = string_format("RTL-SDR #%d (Unavailable)", i);
                 devices_[i]->unavailable = true;
             }
         }
