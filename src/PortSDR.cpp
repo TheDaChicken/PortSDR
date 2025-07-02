@@ -41,7 +41,7 @@ std::shared_ptr<PortSDR::Host> PortSDR::PortSDR::GetHost(Host::HostType name)
     const auto iter = std::find_if(m_hosts.begin(), m_hosts.end(),
                                    [name](const std::shared_ptr<Host>& key)
                                    {
-                                       return key->getType() == name;
+                                       return key->GetType() == name;
                                    });
 
     if (iter != m_hosts.end())

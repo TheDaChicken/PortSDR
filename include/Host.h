@@ -31,12 +31,12 @@ namespace PortSDR
         [[nodiscard]] virtual const std::vector<std::shared_ptr<Device>>& Devices() const = 0;
         virtual void RefreshDevices() = 0;
 
-        [[nodiscard]] HostType getType() const
+        [[nodiscard]] HostType GetType() const
         {
             return type_;
         }
 
-        [[nodiscard]] std::string_view getTypeName() const
+        [[nodiscard]] std::string_view GetTypeName() const
         {
             switch (type_)
             {
