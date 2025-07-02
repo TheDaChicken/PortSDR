@@ -5,16 +5,19 @@ set(GIT_HASH "unknown")
 find_package(Git QUIET)
 if(GIT_FOUND)
     execute_process(
-            COMMAND git log -1 --pretty=format:%h
+            COMMAND ${GIT_EXECUTABLE} log -1 --pretty=format:%h
+            WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
             OUTPUT_VARIABLE GIT_HASH
             OUTPUT_STRIP_TRAILING_WHITESPACE
-            ERROR_QUIET
     )
 
     if (GIT_HASH STREQUAL "")
         message(WARNING "Git failed, using 'unknown' as hash")
         set(GIT_HASH "unknown")
     endif()
+else ()
+    message(WARNING "Git not found, using 'unknown' as hash")
+    set(GIT_HASH "unknown")
 endif()
 
 message(STATUS "Git hash: ${GIT_HASH}")
