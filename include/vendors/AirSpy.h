@@ -5,7 +5,7 @@
 #ifndef AIRSPY_H
 #define AIRSPY_H
 
-#include "PortSDR.h"
+#include "../PortSDR.h"
 #include "libairspy/airspy.h"
 
 namespace PortSDR

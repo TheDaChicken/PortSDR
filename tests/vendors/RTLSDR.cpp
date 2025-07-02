@@ -11,7 +11,7 @@
 TEST(RTLSDR, Devices)
 {
     PortSDR::PortSDR portSDR;
-    std::shared_ptr<PortSDR::Host> sdrHost = portSDR.FindHost("RTL-SDR");
+    std::shared_ptr<PortSDR::Host> sdrHost = portSDR.GetHost(PortSDR::Host::RTL_SDR);
 
     ASSERT_TRUE(sdrHost);
 
@@ -32,7 +32,7 @@ TEST(RTLSDR, Devices)
 TEST(RTLSDR, Stream)
 {
     PortSDR::PortSDR portSDR;
-    std::shared_ptr<PortSDR::Host> sdrHost = portSDR.FindHost("RTL-SDR");
+    std::shared_ptr<PortSDR::Host> sdrHost = portSDR.GetHost(PortSDR::Host::RTL_SDR);
 
     ASSERT_TRUE(sdrHost);
 

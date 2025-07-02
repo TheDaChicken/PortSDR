@@ -2,17 +2,15 @@
 // Created by TheDaChicken on 12/17/2024.
 //
 
-#include "AirSpy.h"
+#include "../../include/vendors/AirSpy.h"
 #include "libairspy/airspy.h"
 
 #include <Utils.h>
 
 #define AIRSPY_MAX_DEVICE 32
 
-PortSDR::AirSpyHost::AirSpyHost() : Host()
+PortSDR::AirSpyHost::AirSpyHost() : Host(AIRSPY)
 {
-    name = "AirSpy";
-
     RefreshDevices();
 }
 

@@ -9,7 +9,7 @@
 TEST(AirSpy, Devices)
 {
     PortSDR::PortSDR portSDR;
-    std::shared_ptr<PortSDR::Host> sdrHost = portSDR.FindHost("AirSpy");
+    std::shared_ptr<PortSDR::Host> sdrHost = portSDR.GetHost(PortSDR::Host::AIRSPY);
 
     ASSERT_TRUE(sdrHost);
 
@@ -30,7 +30,7 @@ TEST(AirSpy, Devices)
 TEST(AirSpy, Stream)
 {
     PortSDR::PortSDR portSDR;
-    std::shared_ptr<PortSDR::Host> sdrHost = portSDR.FindHost("AirSpy");
+    std::shared_ptr<PortSDR::Host> sdrHost = portSDR.GetHost(PortSDR::Host::AIRSPY);
 
     ASSERT_TRUE(sdrHost);
 

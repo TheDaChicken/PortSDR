@@ -2,7 +2,7 @@
 // Created by TheDaChicken on 12/15/2024.
 //
 
-#include "RTLSDR.h"
+#include "../../include/vendors/RTLSDR.h"
 #include "rtl-sdr.h"
 
 #include <cassert>
@@ -13,14 +13,14 @@
 
 #include <Utils.h>
 
+#include "Ranges.h"
+
 #define MAX_STR_SIZE 256
 #define BUF_NUM  64
 #define BUF_LEN  (4 * 32 * 512) /* must be multiple of 512 */
 
-PortSDR::RTLHost::RTLHost() : Host()
+PortSDR::RTLHost::RTLHost() : Host(RTL_SDR)
 {
-    name = "RTL-SDR";
-
     RefreshDevices();
 }
 
@@ -55,12 +55,12 @@ void PortSDR::RTLHost::RefreshDevices()
         else
         {
             devices_[i]->name = rtlsdr_get_device_name(device_count);
+        }
 
-            if (devices_[i]->name == "")
-            {
-                devices_[i]->name = string_format("RTL-SDR #%d (Unavailable)", i);
-                devices_[i]->unavailable = true;
-            }
+        if (devices_[i]->name.empty())
+        {
+            devices_[i]->name = string_format("RTL-SDR #%d (Unavailable)", i);
+            devices_[i]->unavailable = true;
         }
     }
 }
