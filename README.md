@@ -198,7 +198,7 @@ This library contains automatic converters to convert the samples to any format 
 std::unique_ptr<PortSDR::Stream> stream = device->CreateStream();
 
 // Set the sample format to 16-bit
-stream->SetSampleFormat(PortSDR::SAMPLE_FORMAT_INT16);
+stream->SetSampleFormat(PortSDR::SAMPLE_FORMAT_IQ_INT16);
 ```
 
 Currently supported formats from SDR vendors:
