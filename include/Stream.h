@@ -15,9 +15,9 @@ namespace PortSDR
 
     enum SampleFormat
     {
-        SAMPLE_FORMAT_UINT8,
-        SAMPLE_FORMAT_INT16,
-        SAMPLE_FORMAT_FLOAT32,
+        SAMPLE_FORMAT_IQ_UINT8,
+        SAMPLE_FORMAT_IQ_INT16,
+        SAMPLE_FORMAT_IQ_FLOAT32,
     };
 
     struct SDRTransfer

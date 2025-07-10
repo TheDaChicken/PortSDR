@@ -91,7 +91,7 @@ int PortSDR::AirSpyStream::Initialize(const std::shared_ptr<Device>& device)
         return ret;
     }
 
-    ret = SetSampleFormat(SAMPLE_FORMAT_INT16);
+    ret = SetSampleFormat(SAMPLE_FORMAT_IQ_INT16);
     if (ret != AIRSPY_SUCCESS)
     {
         return ret;
@@ -287,7 +287,7 @@ std::vector<PortSDR::Gain> PortSDR::AirSpyStream::GetGainStages() const
 
 std::vector<PortSDR::SampleFormat> PortSDR::AirSpyStream::GetSampleFormats() const
 {
-    return {SAMPLE_FORMAT_INT16, SAMPLE_FORMAT_FLOAT32};
+    return {SAMPLE_FORMAT_IQ_INT16, SAMPLE_FORMAT_IQ_FLOAT32};
 }
 
 uint32_t PortSDR::AirSpyStream::GetCenterFrequency() const
@@ -314,9 +314,9 @@ airspy_sample_type PortSDR::AirSpyStream::ConvertToSampleType(const SampleFormat
 {
     switch (format)
     {
-    case SAMPLE_FORMAT_INT16:
+    case SAMPLE_FORMAT_IQ_INT16:
         return AIRSPY_SAMPLE_INT16_IQ;
-    case SAMPLE_FORMAT_FLOAT32:
+    case SAMPLE_FORMAT_IQ_FLOAT32:
         return AIRSPY_SAMPLE_FLOAT32_IQ;
     default:
         return AIRSPY_SAMPLE_END;

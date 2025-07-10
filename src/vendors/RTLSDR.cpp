@@ -148,7 +148,7 @@ int PortSDR::RTLStream::SetSampleRate(uint32_t freq)
 
 int PortSDR::RTLStream::SetSampleFormat(SampleFormat type)
 {
-    if (type == SAMPLE_FORMAT_INT16)
+    if (type == SAMPLE_FORMAT_IQ_INT16)
     {
         m_outputBuffer.resize(BUF_LEN * sizeof(int16_t));
         m_sampleFormat = type;
@@ -339,7 +339,7 @@ std::vector<std::string> PortSDR::RTLStream::GetGainModes() const
 
 std::vector<PortSDR::SampleFormat> PortSDR::RTLStream::GetSampleFormats() const
 {
-    return {SAMPLE_FORMAT_UINT8, SAMPLE_FORMAT_INT16};
+    return {SAMPLE_FORMAT_IQ_UINT8, SAMPLE_FORMAT_IQ_INT16};
 }
 
 void PortSDR::RTLStream::RTLSDRCallback(unsigned char* buf, uint32_t len, void* ctx)
@@ -351,21 +351,21 @@ void PortSDR::RTLStream::RTLSDRCallback(unsigned char* buf, uint32_t len, void* 
 
     transfer.format = obj->m_sampleFormat;
 
-    if (obj->m_sampleFormat == SAMPLE_FORMAT_UINT8)
+    if (obj->m_sampleFormat == SAMPLE_FORMAT_IQ_UINT8)
     {
         transfer.data = buf;
-        transfer.frame_size = len;
+        transfer.frame_size = len/2;
 
         obj->m_callback(transfer);
     }
-    else if (obj->m_sampleFormat == SAMPLE_FORMAT_INT16)
+    else if (obj->m_sampleFormat == SAMPLE_FORMAT_IQ_INT16)
     {
         obj->uint8ToInt16.Process(buf,
                                   reinterpret_cast<int16_t*>(obj->m_outputBuffer.data()),
                                   len);
 
         transfer.data = obj->m_outputBuffer.data();
-        transfer.frame_size = len;
+        transfer.frame_size = len/2;
 
         obj->m_callback(transfer);
     }
