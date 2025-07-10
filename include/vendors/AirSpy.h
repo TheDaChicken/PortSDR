@@ -59,8 +59,10 @@ namespace PortSDR
 
     private:
         static int AirSpySDRCallback(airspy_transfer* transfer);
+        static airspy_sample_type ConvertToSampleType(SampleFormat format) ;
 
         airspy_device* m_device = nullptr;
+        SampleFormat m_sampleType = SAMPLE_FORMAT_FLOAT32;
         uint32_t m_sampleRate = 0;
         uint32_t m_freq = 0;
         uint8_t m_gain = 0;

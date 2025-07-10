@@ -91,7 +91,7 @@ int PortSDR::AirSpyStream::Initialize(const std::shared_ptr<Device>& device)
         return ret;
     }
 
-    ret = airspy_set_sample_type(m_device, AIRSPY_SAMPLE_INT16_IQ);
+    ret = SetSampleFormat(SAMPLE_FORMAT_INT16);
     if (ret != AIRSPY_SUCCESS)
     {
         return ret;
@@ -173,20 +173,16 @@ int PortSDR::AirSpyStream::SetSampleFormat(SampleFormat format)
     if (!m_device)
         return -1;
 
-    airspy_sample_type sampleType;
-    switch (format)
-    {
-    case SAMPLE_FORMAT_INT16:
-        sampleType = AIRSPY_SAMPLE_INT16_IQ;
-        break;
-    case SAMPLE_FORMAT_FLOAT32:
-        sampleType = AIRSPY_SAMPLE_FLOAT32_IQ;
-        break;
-    default:
-        return -1;
-    }
+    const airspy_sample_type sampleType = ConvertToSampleType(format);
+    if (sampleType == AIRSPY_SAMPLE_END)
+        return -1; // Invalid sample format
 
-    return airspy_set_sample_type(m_device, sampleType);
+    int ret = airspy_set_sample_type(m_device, sampleType);
+    if (ret != AIRSPY_SUCCESS)
+        return ret;
+
+    m_sampleType = format;
+    return 0;
 }
 
 int PortSDR::AirSpyStream::SetLnaGain(int gain)
@@ -314,11 +310,30 @@ const std::string PortSDR::AirSpyStream::GetGainMode() const
     return m_gainMode == LINEARITY ? "LINEARITY" : "SENSITIVITY";
 }
 
+airspy_sample_type PortSDR::AirSpyStream::ConvertToSampleType(const SampleFormat format)
+{
+    switch (format)
+    {
+    case SAMPLE_FORMAT_INT16:
+        return AIRSPY_SAMPLE_INT16_IQ;
+    case SAMPLE_FORMAT_FLOAT32:
+        return AIRSPY_SAMPLE_FLOAT32_IQ;
+    default:
+        return AIRSPY_SAMPLE_END;
+    }
+}
+
 int PortSDR::AirSpyStream::AirSpySDRCallback(airspy_transfer* transfer)
 {
-    auto* obj = static_cast<AirSpyStream*>(transfer->ctx);
+    const auto* obj = static_cast<AirSpyStream*>(transfer->ctx);
 
-    obj->m_callback(transfer->samples, transfer->sample_count);
+    SDRTransfer sdr_transfer{};
+    sdr_transfer.data = transfer->samples;
+    sdr_transfer.frame_size = transfer->sample_count;
+    sdr_transfer.dropped_samples = transfer->dropped_samples;
+    sdr_transfer.format = obj->m_sampleType;
+
+    obj->m_callback(sdr_transfer);
     return 0;
 }
 

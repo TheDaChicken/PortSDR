@@ -347,16 +347,27 @@ void PortSDR::RTLStream::RTLSDRCallback(unsigned char* buf, uint32_t len, void* 
     auto* obj = static_cast<RTLStream*>(ctx);
     assert(obj != nullptr);
 
+    SDRTransfer transfer{};
+
+    transfer.format = obj->m_sampleFormat;
+
     if (obj->m_sampleFormat == SAMPLE_FORMAT_UINT8)
     {
-        obj->m_callback(buf, len);
+        transfer.data = buf;
+        transfer.frame_size = len;
+
+        obj->m_callback(transfer);
     }
     else if (obj->m_sampleFormat == SAMPLE_FORMAT_INT16)
     {
         obj->uint8ToInt16.Process(buf,
                                   reinterpret_cast<int16_t*>(obj->m_outputBuffer.data()),
                                   len);
-        obj->m_callback(obj->m_outputBuffer.data(), len);
+
+        transfer.data = obj->m_outputBuffer.data();
+        transfer.frame_size = len;
+
+        obj->m_callback(transfer);
     }
 }
 

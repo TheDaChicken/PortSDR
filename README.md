@@ -160,7 +160,7 @@ int main()
     std::unique_ptr<PortSDR::Stream> stream = device->CreateStream();
     
     // Set callback
-    stream->SetCallback([](const void *buffer, std::size_t elements)
+    stream->SetCallback([](PortSDR::SDRTransfer& transfer)
     {
         // Do something with the samples
     });

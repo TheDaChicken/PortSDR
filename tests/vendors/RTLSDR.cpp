@@ -46,9 +46,9 @@ TEST(RTLSDR, Stream)
     ASSERT_EQ(stream->Initialize(device), 0) << "Failed to initialize stream";
 
     // Test callback
-    ASSERT_EQ(stream->SetCallback([](const void *data, std::size_t elementSize)
+    ASSERT_EQ(stream->SetCallback([](const PortSDR::SDRTransfer& sdr)
                   {
-                  std::cout << "Received " << elementSize << " samples" << std::endl;
+                  std::cout << "Received " << sdr.frame_size << " samples" << std::endl;
                   }),
               0) << "Failed to set callback";
 

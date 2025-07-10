@@ -20,10 +20,18 @@ namespace PortSDR
         SAMPLE_FORMAT_FLOAT32,
     };
 
+    struct SDRTransfer
+    {
+        void* data;
+        std::size_t frame_size;
+        std::size_t dropped_samples; // Some APIs may report dropped samples
+        SampleFormat format; // Sample format of the data
+    };
+
     class Stream
     {
     public:
-        using SDR_CALLBACK = std::function<void(const void* data, std::size_t elementSize)>;
+        using SDR_CALLBACK = std::function<void(SDRTransfer& transfer)>;
 
         Stream() = default;
         virtual ~Stream() = default;
