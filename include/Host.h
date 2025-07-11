@@ -19,7 +19,8 @@ namespace PortSDR
         enum HostType
         {
             RTL_SDR,
-            AIRSPY
+            AIRSPY,
+            AIRSPY_HF,
         };
 
         explicit Host(const HostType host_type) : type_(host_type)

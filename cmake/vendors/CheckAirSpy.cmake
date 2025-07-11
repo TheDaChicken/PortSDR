@@ -1,6 +1,6 @@
 if (NOT LIBAIRSPY_FOUND)
     find_package(LIBAIRSPY)
-endif()
+endif ()
 
 if (NOT LIBAIRSPY_FOUND)
     message(STATUS "Building LIBAIRSPY from source.")
@@ -23,7 +23,7 @@ if (NOT LIBAIRSPY_FOUND)
             GIT_TAG 0bccf3b88830d3e5ec029cfb42b9d4c2f2ec8554
             PREFIX ${LIBAIRSPY_PREFIX}
             UPDATE_COMMAND ""
-            BYPRODUCTS ${LIBAIRSPY_LIBRARIES}
+            BUILD_BYPRODUCTS ${LIBAIRSPY_LIBRARIES}
             CMAKE_ARGS
             ${COMMON_CMAKE_ARGS}
             -DCMAKE_INSTALL_PREFIX:STRING=${LIBAIRSPY_PREFIX}
@@ -39,8 +39,56 @@ if (NOT LIBAIRSPY_FOUND)
     )
     target_link_libraries(libairspy::libairspy INTERFACE libusb::libusb)
 
-    add_dependencies (libairspy::libairspy LibAirSpyExternal)
+    add_dependencies(libairspy::libairspy LibAirSpyExternal)
 
     list(APPEND PortSDR_DEPENDENCIES libairspy::libairspy)
     set(LIBAIRSPY_FOUND TRUE)
-endif()
+endif ()
+
+if (NOT LIBAIRSPYHF_FOUND)
+    find_package(LIBAIRSPYHF)
+endif ()
+
+if (NOT LIBAIRSPYHF_FOUND)
+    message(STATUS "Building LIBAIRSPYHF from source.")
+
+    set(LIBAIRSPYHF_PREFIX "${CMAKE_BINARY_DIR}/libairspyhf")
+    set(LIBAIRSPYHF_INCLUDE_DIR "${LIBAIRSPYHF_PREFIX}/include/")
+    if (WIN32)
+        set(LIBAIRSPYHF_LIBRARIES "${LIBAIRSPYHF_PREFIX}/bin/libairspyhf.a")
+    else ()
+        set(LIBAIRSPYHF_LIBRARIES "${LIBAIRSPYHF_PREFIX}/lib/libairspyhf.a")
+    endif ()
+
+    if (NOT LIBUSB_FOUND)
+        find_package(LIBUSB REQUIRED)
+    endif ()
+
+    # must be external project because of the uninstall target in the CMakeLists.txt
+    ExternalProject_Add(LibAirSpyHFExternal
+            GIT_REPOSITORY https://github.com/airspy/airspyhf.git
+            GIT_TAG 7b94498638f49ac66f806a60c711db8bbb1518fb
+            PREFIX ${LIBAIRSPYHF_PREFIX}
+            UPDATE_COMMAND ""
+            BUILD_BYPRODUCTS ${LIBAIRSPYHF_LIBRARIES}
+            CMAKE_ARGS
+            ${COMMON_CMAKE_ARGS}
+            -DCMAKE_INSTALL_PREFIX:STRING=${LIBAIRSPYHF_PREFIX}
+            -DLIBUSB_LIBRARIES:STRING=${LIBUSB_LIBRARIES}
+            -DLIBUSB_INCLUDE_DIR:STRING=${LIBUSB_INCLUDE_DIR}
+            -DTHREADS_PTHREADS_WIN32_LIBRARY=OFF
+    )
+    file(MAKE_DIRECTORY ${LIBAIRSPYHF_INCLUDE_DIR})
+
+    add_library(libairspyhf::libairspyhf INTERFACE IMPORTED GLOBAL)
+    set_target_properties(libairspyhf::libairspyhf PROPERTIES
+            INTERFACE_INCLUDE_DIRECTORIES "${LIBAIRSPYHF_INCLUDE_DIR}"
+            INTERFACE_LINK_LIBRARIES "${LIBAIRSPYHF_LIBRARIES}"
+    )
+    target_link_libraries(libairspyhf::libairspyhf INTERFACE libusb::libusb)
+
+    add_dependencies(libairspyhf::libairspyhf LibAirSpyHFExternal)
+
+    list(APPEND PortSDR_DEPENDENCIES LibAirSpyHFExternal)
+    set(LIBAIRSPYHF_FOUND TRUE)
+endif ()

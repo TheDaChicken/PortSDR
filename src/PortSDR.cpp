@@ -12,6 +12,10 @@
 #include "vendors/AirSpy.h"
 #endif
 
+#ifdef AIRSPYHF_SUPPORT
+#include "vendors/AirSpyHf.h"
+#endif
+
 std::vector<std::shared_ptr<PortSDR::Host>> m_hosts;
 
 std::string PortSDR::PortSDR::GetVersion()
@@ -28,6 +32,10 @@ PortSDR::PortSDR::PortSDR()
 
 #ifdef AIRSPY_SUPPORT
     m_hosts.emplace_back(std::make_shared<AirSpyHost>());
+#endif
+
+#ifdef AIRSPYHF_SUPPORT
+    m_hosts.emplace_back(std::make_shared<AirSpyHfHost>());
 #endif
 }
 

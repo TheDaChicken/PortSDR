@@ -16,6 +16,14 @@ if (LIBAIRSPY_FOUND)
     list(APPEND PortSDR_LIBRARIES libairspy::libairspy)
 endif ()
 
+if (LIBAIRSPYHF_FOUND)
+    list(APPEND PortSDR_VENDOR_FILES
+            ../include/vendors/AirSpyHf.h
+            vendors/AirSpyHf.cpp
+    )
+    list(APPEND PortSDR_LIBRARIES libairspyhf::libairspyhf)
+endif()
+
 add_library(${PortSDR_LIBRARY_NAME}
         ${LIBRARY_BUILD_TYPE}
         PortSDR.cpp
@@ -43,6 +51,10 @@ endif ()
 if (LIBAIRSPY_FOUND)
     target_compile_definitions(${PortSDR_LIBRARY_NAME} PUBLIC AIRSPY_SUPPORT=ON)
 endif ()
+
+if (LIBAIRSPYHF_FOUND)
+    target_compile_definitions(${PortSDR_LIBRARY_NAME} PUBLIC AIRSPYHF_SUPPORT=ON)
+endif()
 
 install(TARGETS ${PortSDR_LIBRARY_NAME}
         PUBLIC_HEADER DESTINATION include

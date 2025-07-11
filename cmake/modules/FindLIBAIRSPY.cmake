@@ -5,6 +5,7 @@
 #  LIBAIRSPY_INCLUDE_DIR - the libairspy include directory
 #  LIBAIRSPY_LIBRARIES - Link these to use libairspy
 
+
 # Copyright (c) 2013  Benjamin Vernoux
 #
 
@@ -19,7 +20,7 @@ endif ()
 
 if (NOT LIBUSB_FOUND)
     find_package(LIBUSB REQUIRED)
-endif()
+endif ()
 
 FIND_PATH(LIBAIRSPY_INCLUDE_DIR
         NAMES airspy.h
@@ -35,7 +36,6 @@ find_library(LIBAIRSPY_LIBRARIES
 )
 
 find_package_handle_standard_args(LIBAIRSPY DEFAULT_MSG LIBAIRSPY_LIBRARIES LIBAIRSPY_INCLUDE_DIR)
-
 mark_as_advanced(LIBAIRSPY_INCLUDE_DIR LIBAIRSPY_LIBRARIES)
 
 if (LIBAIRSPY_FOUND)
