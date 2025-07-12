@@ -66,8 +66,8 @@ if (NOT LIBAIRSPYHF_FOUND)
 
     # must be external project because of the uninstall target in the CMakeLists.txt
     ExternalProject_Add(LibAirSpyHFExternal
-            GIT_REPOSITORY https://github.com/airspy/airspyhf.git
-            GIT_TAG 7b94498638f49ac66f806a60c711db8bbb1518fb
+            GIT_REPOSITORY https://github.com/thedachicken/airspyhf.git
+            GIT_TAG use-after-free
             PREFIX ${LIBAIRSPYHF_PREFIX}
             UPDATE_COMMAND ""
             BUILD_BYPRODUCTS ${LIBAIRSPYHF_LIBRARIES}
