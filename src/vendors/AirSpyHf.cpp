@@ -88,12 +88,6 @@ int PortSDR::AirSpyHfStream::Initialize(const std::shared_ptr<Device>& device)
         return ret;
     }
 
-    ret = SetSampleFormat(SAMPLE_FORMAT_IQ_INT16);
-    if (ret != AIRSPYHF_SUCCESS)
-    {
-        return ret;
-    }
-
     return 0;
 }
 
@@ -151,7 +145,7 @@ int PortSDR::AirSpyHfStream::SetSampleFormat(SampleFormat format)
     if (!m_device)
         return -1;
 
-    if (format != SAMPLE_FORMAT_IQ_INT16)
+    if (format != getNativeSampleFormat())
         return -1; // AirSpy HF does not support sample format changes
 
     return 0;
@@ -203,7 +197,7 @@ std::vector<uint32_t> PortSDR::AirSpyHfStream::GetSampleRates() const
 
 std::vector<PortSDR::SampleFormat> PortSDR::AirSpyHfStream::GetSampleFormats() const
 {
-    return {SAMPLE_FORMAT_IQ_FLOAT32};
+    return {getNativeSampleFormat()};
 }
 
 std::vector<std::string> PortSDR::AirSpyHfStream::GetGainModes() const
@@ -245,6 +239,11 @@ const std::string PortSDR::AirSpyHfStream::GetGainMode() const
     return ""; // AirSpy HF does not support gain modes
 }
 
+PortSDR::SampleFormat PortSDR::AirSpyHfStream::getNativeSampleFormat()
+{
+    return SAMPLE_FORMAT_IQ_FLOAT32; // AirSpy HF only supports this format
+}
+
 int PortSDR::AirSpyHfStream::AirSpySDRCallback(airspyhf_transfer_t* transfer)
 {
     const auto* obj = static_cast<AirSpyHfStream*>(transfer->ctx);
@@ -253,7 +252,7 @@ int PortSDR::AirSpyHfStream::AirSpySDRCallback(airspyhf_transfer_t* transfer)
     sdr_transfer.data = transfer->samples;
     sdr_transfer.frame_size = transfer->sample_count;
     sdr_transfer.dropped_samples = transfer->dropped_samples;
-    sdr_transfer.format = SAMPLE_FORMAT_IQ_FLOAT32;
+    sdr_transfer.format = getNativeSampleFormat();
 
     obj->m_callback(sdr_transfer);
     return 0;

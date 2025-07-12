@@ -56,6 +56,8 @@ namespace PortSDR
         [[nodiscard]] const std::string GetGainMode() const override;
 
     private:
+        [[nodiscard]] static SampleFormat getNativeSampleFormat();
+
         static int AirSpySDRCallback(airspyhf_transfer_t* transfer);
 
         airspyhf_device *m_device = nullptr;
