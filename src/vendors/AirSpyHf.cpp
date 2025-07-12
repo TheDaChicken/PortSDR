@@ -203,7 +203,7 @@ std::vector<uint32_t> PortSDR::AirSpyHfStream::GetSampleRates() const
 
 std::vector<PortSDR::SampleFormat> PortSDR::AirSpyHfStream::GetSampleFormats() const
 {
-    return {SAMPLE_FORMAT_IQ_INT16};
+    return {SAMPLE_FORMAT_IQ_FLOAT32};
 }
 
 std::vector<std::string> PortSDR::AirSpyHfStream::GetGainModes() const
@@ -253,7 +253,7 @@ int PortSDR::AirSpyHfStream::AirSpySDRCallback(airspyhf_transfer_t* transfer)
     sdr_transfer.data = transfer->samples;
     sdr_transfer.frame_size = transfer->sample_count;
     sdr_transfer.dropped_samples = transfer->dropped_samples;
-    sdr_transfer.format = SAMPLE_FORMAT_IQ_INT16;
+    sdr_transfer.format = SAMPLE_FORMAT_IQ_FLOAT32;
 
     obj->m_callback(sdr_transfer);
     return 0;
