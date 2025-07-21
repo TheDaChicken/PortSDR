@@ -6,6 +6,7 @@
 #define PORTSDR_DEVICE_H
 
 #include <string>
+#include <cstdint>
 
 namespace PortSDR
 {

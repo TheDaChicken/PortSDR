@@ -8,6 +8,7 @@
 #include <functional>
 
 #include "Ranges.h"
+#include <cstdint>
 
 namespace PortSDR
 {
