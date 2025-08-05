@@ -271,6 +271,11 @@ double PortSDR::RTLStream::GetGain() const
     return rtlsdr_get_tuner_gain(m_dev) / 10.0;
 }
 
+double PortSDR::RTLStream::GetGain(std::string_view name) const
+{
+    return 0;
+}
+
 const std::string PortSDR::RTLStream::GetGainMode() const
 {
     return "";

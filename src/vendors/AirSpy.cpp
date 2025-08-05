@@ -190,7 +190,12 @@ int PortSDR::AirSpyStream::SetLnaGain(double gain)
     if (!m_device)
         return -1;
 
-    return airspy_set_lna_gain(m_device, static_cast<uint8_t>(gain));
+    int ret = airspy_set_lna_gain(m_device, static_cast<uint8_t>(gain));
+    if (ret == AIRSPY_SUCCESS)
+    {
+        m_lnaGain = static_cast<uint8_t>(gain);
+    }
+    return ret;
 }
 
 int PortSDR::AirSpyStream::SetMixGain(double gain)
@@ -198,7 +203,12 @@ int PortSDR::AirSpyStream::SetMixGain(double gain)
     if (!m_device)
         return -1;
 
-    return airspy_set_mixer_gain(m_device, static_cast<uint8_t>(gain));
+    int ret = airspy_set_mixer_gain(m_device, static_cast<uint8_t>(gain));
+    if (ret == AIRSPY_SUCCESS)
+    {
+        m_mixGain = static_cast<uint8_t>(gain);
+    }
+    return ret;
 }
 
 int PortSDR::AirSpyStream::SetIfGain(double gain)
@@ -206,7 +216,12 @@ int PortSDR::AirSpyStream::SetIfGain(double gain)
     if (!m_device)
         return -1;
 
-    return airspy_set_vga_gain(m_device, static_cast<uint8_t>(gain));;
+    int ret = airspy_set_vga_gain(m_device, static_cast<uint8_t>(gain));
+    if (ret == AIRSPY_SUCCESS)
+    {
+        m_ifGain = static_cast<uint8_t>(gain);
+    }
+    return ret;
 }
 
 int PortSDR::AirSpyStream::SetGain(double gain, std::string_view name)
@@ -303,6 +318,17 @@ uint32_t PortSDR::AirSpyStream::GetSampleRate() const
 double PortSDR::AirSpyStream::GetGain() const
 {
     return m_gain;
+}
+
+double PortSDR::AirSpyStream::GetGain(std::string_view name) const
+{
+    if (name == "LNA")
+        return m_lnaGain;
+    if (name == "MIX")
+        return m_mixGain;
+    if (name == "IF")
+        return m_ifGain;
+    return 0.0;
 }
 
 const std::string PortSDR::AirSpyStream::GetGainMode() const

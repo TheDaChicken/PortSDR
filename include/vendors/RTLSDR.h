@@ -52,6 +52,7 @@ namespace PortSDR
         [[nodiscard]] uint32_t GetCenterFrequency() const override;
         [[nodiscard]] uint32_t GetSampleRate() const override;
         [[nodiscard]] double GetGain() const override;
+        [[nodiscard]] double GetGain(std::string_view name) const override;
         [[nodiscard]] const std::string GetGainMode() const override;
 
         [[nodiscard]] Gain GetGainStage() const override;
