@@ -157,7 +157,7 @@ int PortSDR::RTLStream::SetSampleFormat(SampleFormat type)
     return 0;
 }
 
-int PortSDR::RTLStream::SetIfGain(float gain)
+int PortSDR::RTLStream::SetIfGain(double gain)
 {
     if (!m_dev)
         return 0;
