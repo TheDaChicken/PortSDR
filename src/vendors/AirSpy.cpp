@@ -300,7 +300,7 @@ uint32_t PortSDR::AirSpyStream::GetSampleRate() const
     return m_sampleRate;
 }
 
-int PortSDR::AirSpyStream::GetGain() const
+double PortSDR::AirSpyStream::GetGain() const
 {
     return m_gain;
 }

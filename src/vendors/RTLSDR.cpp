@@ -263,12 +263,12 @@ uint32_t PortSDR::RTLStream::GetSampleRate() const
     return rtlsdr_get_sample_rate(m_dev);
 }
 
-int PortSDR::RTLStream::GetGain() const
+double PortSDR::RTLStream::GetGain() const
 {
     if (!m_dev)
         return 0;
 
-    return rtlsdr_get_tuner_gain(m_dev);
+    return rtlsdr_get_tuner_gain(m_dev) / 10.0;
 }
 
 const std::string PortSDR::RTLStream::GetGainMode() const

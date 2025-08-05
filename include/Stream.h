@@ -59,7 +59,7 @@ namespace PortSDR
 
         [[nodiscard]] virtual uint32_t GetCenterFrequency() const = 0;
         [[nodiscard]] virtual uint32_t GetSampleRate() const = 0;
-        [[nodiscard]] virtual int GetGain() const = 0;
+        [[nodiscard]] virtual double GetGain() const = 0;
         [[nodiscard]] virtual const std::string GetGainMode() const = 0;
 
         int SetCallback(SDR_CALLBACK sdr_callback)

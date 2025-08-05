@@ -229,7 +229,7 @@ uint32_t PortSDR::AirSpyHfStream::GetSampleRate() const
     return m_sampleRate;
 }
 
-int PortSDR::AirSpyHfStream::GetGain() const
+double PortSDR::AirSpyHfStream::GetGain() const
 {
     return 0; // AirSpy HF does not support gain retrieval
 }
