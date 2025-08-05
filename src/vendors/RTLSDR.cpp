@@ -273,6 +273,10 @@ double PortSDR::RTLStream::GetGain() const
 
 double PortSDR::RTLStream::GetGain(std::string_view name) const
 {
+    if ( "LNA" == name ) {
+        return GetGain();
+    }
+
     return 0;
 }
 
