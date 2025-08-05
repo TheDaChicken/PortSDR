@@ -157,7 +157,7 @@ int PortSDR::RTLStream::SetSampleFormat(SampleFormat type)
     return 0;
 }
 
-int PortSDR::RTLStream::SetIfGain(int gain)
+int PortSDR::RTLStream::SetIfGain(float gain)
 {
     if (!m_dev)
         return 0;
@@ -214,14 +214,14 @@ int PortSDR::RTLStream::SetIfGain(int gain)
 
     for (int stage = 1; stage <= gains.size(); stage++)
     {
-        int ret = rtlsdr_set_tuner_if_gain(m_dev, stage, int(gains[stage] * 10.0));
+        int ret = rtlsdr_set_tuner_if_gain(m_dev, stage, static_cast<int>(gains[stage] * 10.0));
         if (ret < 0)
             return ret;
     }
     return 0;
 }
 
-int PortSDR::RTLStream::SetGain(int gain, std::string_view name)
+int PortSDR::RTLStream::SetGain(double gain, std::string_view name)
 {
     if ("IF" == name)
     {
@@ -234,12 +234,12 @@ int PortSDR::RTLStream::SetGain(int gain, std::string_view name)
     return -1;
 }
 
-int PortSDR::RTLStream::SetGain(int gain)
+int PortSDR::RTLStream::SetGain(double gain)
 {
     if (!m_dev)
         return 0;
 
-    return rtlsdr_set_tuner_gain(m_dev, gain);
+    return rtlsdr_set_tuner_gain(m_dev, gain * 10.0);
 }
 
 int PortSDR::RTLStream::SetGainModes(std::string_view mode)
@@ -293,7 +293,7 @@ PortSDR::Gain PortSDR::RTLStream::GetGainStage() const
 
     count = rtlsdr_get_tuner_gains(m_dev, gains.data());
     for (int i = 0; i < count; i++)
-        range.emplace_back(gains[i]);
+        range.emplace_back(static_cast<double>(gains[i]) / 10.0f);
 
     return {"LNA", range};
 }
@@ -354,7 +354,7 @@ void PortSDR::RTLStream::RTLSDRCallback(unsigned char* buf, uint32_t len, void* 
     if (obj->m_sampleFormat == SAMPLE_FORMAT_IQ_UINT8)
     {
         transfer.data = buf;
-        transfer.frame_size = len/2;
+        transfer.frame_size = len / 2;
 
         obj->m_callback(transfer);
     }
@@ -365,7 +365,7 @@ void PortSDR::RTLStream::RTLSDRCallback(unsigned char* buf, uint32_t len, void* 
                                   len);
 
         transfer.data = obj->m_outputBuffer.data();
-        transfer.frame_size = len/2;
+        transfer.frame_size = len / 2;
 
         obj->m_callback(transfer);
     }

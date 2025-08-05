@@ -39,11 +39,11 @@ namespace PortSDR
         int SetSampleRate(uint32_t freq) override;
         int SetSampleFormat(SampleFormat type) override;
 
-        int SetGain(int gain, std::string_view name) override;
-        int SetGain(int gain) override;
+        int SetGain(double gain, std::string_view name) override;
+        int SetGain(double gain) override;
         int SetGainModes(std::string_view mode) override;
 
-        int SetIfGain(int gain);
+        int SetIfGain(double gain);
 
         [[nodiscard]] std::vector<uint32_t> GetSampleRates() const override;
         [[nodiscard]] std::vector<std::string> GetGainModes() const override;

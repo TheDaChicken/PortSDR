@@ -146,7 +146,7 @@ int PortSDR::AirSpyStream::SetSampleRate(uint32_t sampleRate)
     return ret;
 }
 
-int PortSDR::AirSpyStream::SetGain(int gain)
+int PortSDR::AirSpyStream::SetGain(double gain)
 {
     if (!m_device)
         return -1;
@@ -185,7 +185,7 @@ int PortSDR::AirSpyStream::SetSampleFormat(SampleFormat format)
     return 0;
 }
 
-int PortSDR::AirSpyStream::SetLnaGain(int gain)
+int PortSDR::AirSpyStream::SetLnaGain(double gain)
 {
     if (!m_device)
         return -1;
@@ -193,7 +193,7 @@ int PortSDR::AirSpyStream::SetLnaGain(int gain)
     return airspy_set_lna_gain(m_device, static_cast<uint8_t>(gain));
 }
 
-int PortSDR::AirSpyStream::SetMixGain(int gain)
+int PortSDR::AirSpyStream::SetMixGain(double gain)
 {
     if (!m_device)
         return -1;
@@ -201,7 +201,7 @@ int PortSDR::AirSpyStream::SetMixGain(int gain)
     return airspy_set_mixer_gain(m_device, static_cast<uint8_t>(gain));
 }
 
-int PortSDR::AirSpyStream::SetIfGain(int gain)
+int PortSDR::AirSpyStream::SetIfGain(double gain)
 {
     if (!m_device)
         return -1;
@@ -209,7 +209,7 @@ int PortSDR::AirSpyStream::SetIfGain(int gain)
     return airspy_set_vga_gain(m_device, static_cast<uint8_t>(gain));;
 }
 
-int PortSDR::AirSpyStream::SetGain(int gain, std::string_view name)
+int PortSDR::AirSpyStream::SetGain(double gain, std::string_view name)
 {
     if ("LNA" == name)
     {

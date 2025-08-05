@@ -46,8 +46,8 @@ namespace PortSDR
         virtual int SetCenterFrequency(uint32_t freq, int stream) = 0;
         virtual int SetSampleFormat(SampleFormat format) = 0;
 
-        virtual int SetGain(int gain) = 0;
-        virtual int SetGain(int gain, std::string_view name) = 0;
+        virtual int SetGain(double gain) = 0;
+        virtual int SetGain(double gain, std::string_view name) = 0;
         virtual int SetGainModes(std::string_view name) = 0;
 
         virtual std::vector<uint32_t> GetSampleRates() const = 0;

@@ -35,13 +35,13 @@ namespace PortSDR
         int Stop() override;
         int SetCenterFrequency(uint32_t freq, int stream) override;
         int SetSampleRate(uint32_t sampleRate) override;
-        int SetGain(int gain) override;
+        int SetGain(double gain) override;
         int SetSampleFormat(SampleFormat format) override;
 
-        int SetGain(int gain, std::string_view name) override;
+        int SetGain(double gain, std::string_view name) override;
         int SetGainModes(std::string_view name) override;
 
-        int SetAttenuation(int attenuation);
+        int SetAttenuation(double attenuation);
 
         [[nodiscard]] std::vector<uint32_t> GetSampleRates() const override;
         [[nodiscard]] std::vector<SampleFormat> GetSampleFormats() const override;

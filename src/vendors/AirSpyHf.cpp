@@ -135,7 +135,7 @@ int PortSDR::AirSpyHfStream::SetSampleRate(uint32_t sampleRate)
     return 0;
 }
 
-int PortSDR::AirSpyHfStream::SetGain(int gain)
+int PortSDR::AirSpyHfStream::SetGain(double gain)
 {
     return -1; // AirSpy HF does not support gain control
 }
@@ -151,7 +151,7 @@ int PortSDR::AirSpyHfStream::SetSampleFormat(SampleFormat format)
     return 0;
 }
 
-int PortSDR::AirSpyHfStream::SetGain(int gain, std::string_view name)
+int PortSDR::AirSpyHfStream::SetGain(double gain, std::string_view name)
 {
     if (!m_device)
         return -1;
@@ -169,12 +169,12 @@ int PortSDR::AirSpyHfStream::SetGainModes(std::string_view name)
     return 0;
 }
 
-int PortSDR::AirSpyHfStream::SetAttenuation(int attenuation)
+int PortSDR::AirSpyHfStream::SetAttenuation(double attenuation)
 {
     if (!m_device)
         return -1;
 
-    return airspyhf_set_hf_att(m_device, attenuation);
+    return airspyhf_set_hf_att(m_device, static_cast<int>(attenuation));
 }
 
 std::vector<uint32_t> PortSDR::AirSpyHfStream::GetSampleRates() const
