@@ -38,7 +38,7 @@ find_library(LIBAIRSPY_LIBRARIES
 find_package_handle_standard_args(LIBAIRSPY DEFAULT_MSG LIBAIRSPY_LIBRARIES LIBAIRSPY_INCLUDE_DIR)
 mark_as_advanced(LIBAIRSPY_INCLUDE_DIR LIBAIRSPY_LIBRARIES)
 
-if (LIBAIRSPY_FOUND)
+if (LIBAIRSPY_FOUND AND NOT DEFINED libairspyhf::libairspyhf)
     add_library(libairspy::libairspy INTERFACE IMPORTED)
     set_target_properties(libairspy::libairspy PROPERTIES
             INTERFACE_INCLUDE_DIRECTORIES "${LIBAIRSPY_INCLUDE_DIR}"

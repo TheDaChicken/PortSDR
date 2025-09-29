@@ -24,7 +24,7 @@ find_package_handle_standard_args(RTLSDR DEFAULT_MSG
         RTLSDR_INCLUDE_DIR RTLSDR_LIBRARIES
 )
 
-if (RTLSDR_FOUND)
+if (RTLSDR_FOUND AND NOT TARGET rtlsdr::rtlsdr)
     add_library(rtlsdr::rtlsdr INTERFACE IMPORTED)
     set_target_properties(rtlsdr::rtlsdr PROPERTIES
             INTERFACE_INCLUDE_DIRECTORIES "${RTLSDR_INCLUDE_DIR}"
