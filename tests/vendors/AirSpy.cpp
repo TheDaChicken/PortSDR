@@ -13,7 +13,7 @@ TEST(AirSpy, Devices)
 
     ASSERT_TRUE(sdrHost);
 
-    const auto devices = sdrHost->Devices();
+    const auto devices = sdrHost->AvailableDevices();
 
     ASSERT_FALSE(devices.empty()) << "No devices found";
 
@@ -34,7 +34,7 @@ TEST(AirSpy, Stream)
 
     ASSERT_TRUE(sdrHost);
 
-    const std::vector<std::shared_ptr<PortSDR::Device>>& devices = sdrHost->Devices();
+    const std::vector<std::shared_ptr<PortSDR::Device>>& devices = sdrHost->AvailableDevices();
 
     ASSERT_TRUE(!devices.empty());
 

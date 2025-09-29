@@ -8,10 +8,9 @@
 
 PortSDR::AirSpyHfHost::AirSpyHfHost() : Host(AIRSPY_HF)
 {
-
 }
 
-std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::AirSpyHfHost::Devices() const
+std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::AirSpyHfHost::AvailableDevices() const
 {
     std::vector<std::shared_ptr<Device>> devices;
 
@@ -26,39 +25,39 @@ std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::AirSpyHfHost::Devices() c
 
     devices.resize(device_count);
 
+    int dev_id = 0;
+
     for (int i = 0; i < device_count; ++i)
     {
         airspyhf_device* dev = nullptr;
         airspyhf_read_partid_serialno_t read_partid_serialno;
 
-        devices[i] = std::make_shared<Device>();
-        devices[i]->index = serials[i];
-        devices[i]->serial.clear();
-        devices[i]->name = "AIRSPYHF";
-        devices[i]->host = this;
-        devices[i]->unavailable = false;
-
         if (airspyhf_open_sn(&dev, serials[i]) != AIRSPYHF_SUCCESS)
-        {
-            devices[i]->unavailable = true;
-            devices[i]->name += " (Unavailable)";
             continue;
-        }
+
+        auto& device = devices[dev_id++];
+
+        device = std::make_shared<Device>();
+        device->index = serials[i];
+        device->serial.clear();
+        device->name = "AIRSPYHF";
+        device->host = this;
 
         if (airspyhf_board_partid_serialno_read(dev, &read_partid_serialno) == AIRSPYHF_SUCCESS)
         {
-            devices[i]->serial = string_format("%08X%08X",
-                                                read_partid_serialno.serial_no[2],
-                                                read_partid_serialno.serial_no[3]);
+            device->serial = string_format("%08X%08X",
+                                           read_partid_serialno.serial_no[2],
+                                           read_partid_serialno.serial_no[3]);
 
             // FIXME: Why is .c_str() / .data() needed here?
             // If not, the string memory is messed up.
-            devices[i]->name += string_format(" SN: %s", devices[i]->serial.c_str());
+            device->name += string_format(" SN: %s", devices[i]->serial.c_str());
         }
 
         airspyhf_close(dev);
     }
 
+    devices.resize(dev_id);
     return devices;
 }
 

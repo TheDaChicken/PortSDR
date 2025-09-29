@@ -17,7 +17,7 @@ namespace PortSDR
     public:
         RTLHost();
 
-        [[nodiscard]] std::vector<std::shared_ptr<Device>> Devices() const override;
+        [[nodiscard]] std::vector<std::shared_ptr<Device>> AvailableDevices() const override;
         [[nodiscard]] std::unique_ptr<Stream> CreateStream() const override;
     };
 

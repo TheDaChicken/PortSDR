@@ -64,7 +64,7 @@ std::shared_ptr<PortSDR::Device> PortSDR::PortSDR::GetFirstAvailableSDR()
 {
     for (const auto& host : m_hosts)
     {
-        const std::vector<std::shared_ptr<Device>>& devices = host->Devices();
+        const std::vector<std::shared_ptr<Device>>& devices = host->AvailableDevices();
         if (!devices.empty())
         {
             return devices.front();
@@ -78,7 +78,7 @@ std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::PortSDR::GetDevices()
     std::vector<std::shared_ptr<Device>> total_devices;
     for (const auto& host : m_hosts)
     {
-        const auto host_devices = host->Devices();
+        const auto host_devices = host->AvailableDevices();
         total_devices.insert(total_devices.end(), host_devices.begin(), host_devices.end());
     }
 

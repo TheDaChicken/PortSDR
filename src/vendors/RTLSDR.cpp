@@ -23,15 +23,18 @@ PortSDR::RTLHost::RTLHost() : Host(RTL_SDR)
 {
 }
 
-std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::RTLHost::Devices() const
+std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::RTLHost::AvailableDevices() const
 {
-    std::vector<std::shared_ptr<Device>> devices_;
+    std::vector<std::shared_ptr<Device>> devices;
     const uint32_t device_count = rtlsdr_get_device_count();
 
-    devices_.resize(device_count);
+    devices.resize(device_count);
+
+    int dev_id = 0;
 
     for (int i = 0; i < device_count; i++)
     {
+        rtlsdr_dev_t* dev = nullptr;
         char manufact[MAX_STR_SIZE];
         char product[MAX_STR_SIZE];
         char serial[MAX_STR_SIZE];
@@ -40,30 +43,27 @@ std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::RTLHost::Devices() const
         memset(product, 0, sizeof(product));
         memset(serial, 0, sizeof(serial));
 
-        devices_[i] = std::make_shared<Device>();
-        devices_[i]->index = i;
-        devices_[i]->host = this;
-        devices_[i]->serial.clear();
-        devices_[i]->unavailable = false;
+        auto& device = devices[dev_id++];
 
-        if (rtlsdr_get_device_usb_strings(i, manufact, product, serial) == 0)
+        if (rtlsdr_open(&dev, i) < 0)
+            continue;
+
+        device = std::make_shared<Device>();
+        device->index = i;
+        device->host = this;
+        device->serial.clear();
+
+        if (rtlsdr_get_usb_strings(dev, manufact, product, serial) == 0)
         {
-            devices_[i]->serial = serial;
-            devices_[i]->name = string_format("%s %s SN: %s", manufact, product, serial);
-        }
-        else
-        {
-            devices_[i]->name = rtlsdr_get_device_name(device_count);
+            device->serial = serial;
+            device->name = string_format("%s %s SN: %s", manufact, product, serial);
         }
 
-        if (devices_[i]->name.empty())
-        {
-            devices_[i]->name = string_format("RTL-SDR #%d (Unavailable)", i);
-            devices_[i]->unavailable = true;
-        }
+        rtlsdr_close(dev);
     }
 
-    return devices_;
+    devices.resize(dev_id);
+    return devices;
 }
 
 std::unique_ptr<PortSDR::Stream> PortSDR::RTLHost::CreateStream() const

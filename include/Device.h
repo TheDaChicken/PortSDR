@@ -20,7 +20,6 @@ namespace PortSDR
         uint64_t index;
 
         const Host* host; // TODO: Change to std::shared_ptr<Host> or std::weak_ptr<Host> instead to avoid issues
-        bool unavailable;
 
         int CreateStream(std::unique_ptr<Stream>& stream) const;
     };
