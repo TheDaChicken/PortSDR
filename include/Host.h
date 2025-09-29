@@ -29,8 +29,7 @@ namespace PortSDR
 
         virtual ~Host() = default;
 
-        [[nodiscard]] virtual const std::vector<std::shared_ptr<Device>>& Devices() const = 0;
-        virtual void RefreshDevices() = 0;
+        [[nodiscard]] virtual std::vector<std::shared_ptr<Device>> Devices() const = 0;
 
         [[nodiscard]] HostType GetType() const
         {

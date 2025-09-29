@@ -21,14 +21,14 @@
 
 PortSDR::RTLHost::RTLHost() : Host(RTL_SDR)
 {
-    RefreshDevices();
+
 }
 
-void PortSDR::RTLHost::RefreshDevices()
+std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::RTLHost::Devices() const
 {
+    std::vector<std::shared_ptr<Device>> devices_;
     const uint32_t device_count = rtlsdr_get_device_count();
 
-    devices_.clear();
     devices_.resize(device_count);
 
     for (int i = 0; i < device_count; i++)
@@ -63,10 +63,7 @@ void PortSDR::RTLHost::RefreshDevices()
             devices_[i]->unavailable = true;
         }
     }
-}
 
-const std::vector<std::shared_ptr<PortSDR::Device>>& PortSDR::RTLHost::Devices() const
-{
     return devices_;
 }
 

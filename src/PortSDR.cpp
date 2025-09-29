@@ -75,14 +75,14 @@ std::shared_ptr<PortSDR::Device> PortSDR::PortSDR::GetFirstAvailableSDR()
 
 std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::PortSDR::GetDevices()
 {
-    std::vector<std::shared_ptr<Device>> devices;
+    std::vector<std::shared_ptr<Device>> total_devices;
     for (const auto& host : m_hosts)
     {
-        const std::vector<std::shared_ptr<Device>>& host_devices = host->Devices();
-        devices.insert(devices.end(), host_devices.begin(), host_devices.end());
+        const auto host_devices = host->Devices();
+        total_devices.insert(total_devices.end(), host_devices.begin(), host_devices.end());
     }
 
-    return devices;
+    return total_devices;
 }
 
 double PortSDR::MetaRange::max() const

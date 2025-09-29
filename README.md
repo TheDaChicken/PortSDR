@@ -156,7 +156,9 @@ For AirSpy Mini/R2 devices gain modes:
 
 int main()
 {
-    // Open the device
+    // ... etc Open the device
+    
+    // Create Stream
     std::unique_ptr<PortSDR::Stream> stream = device->CreateStream();
     
     // Set callback

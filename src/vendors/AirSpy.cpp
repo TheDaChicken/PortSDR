@@ -11,16 +11,18 @@
 
 PortSDR::AirSpyHost::AirSpyHost() : Host(AIRSPY)
 {
-    RefreshDevices();
 }
 
-void PortSDR::AirSpyHost::RefreshDevices()
+std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::AirSpyHost::Devices() const
 {
-    uint64_t serials[AIRSPY_MAX_DEVICE + 1];
-    const uint32_t device_count = airspy_list_devices(serials, AIRSPY_MAX_DEVICE);
+    std::vector<std::shared_ptr<Device>> devices;
 
-    devices_.clear();
-    devices_.resize(device_count);
+    uint64_t serials[AIRSPY_MAX_DEVICE + 1];
+    int device_count = airspy_list_devices(serials, AIRSPY_MAX_DEVICE);
+    if (device_count < 0)
+        return {};
+
+    devices.resize(device_count);
 
     for (int i = 0; i < device_count; i++)
     {
@@ -28,43 +30,39 @@ void PortSDR::AirSpyHost::RefreshDevices()
         uint8_t board_id;
         airspy_read_partid_serialno_t read_partid_serialno;
 
-        devices_[i] = std::make_shared<Device>();
-        devices_[i]->index = serials[i];
-        devices_[i]->serial.clear();
-        devices_[i]->name = "AIRSPY";
-        devices_[i]->host = this;
-        devices_[i]->unavailable = false;
+        devices[i] = std::make_shared<Device>();
+        devices[i]->index = serials[i];
+        devices[i]->serial.clear();
+        devices[i]->name = "AIRSPY";
+        devices[i]->host = this;
+        devices[i]->unavailable = false;
 
         if (airspy_open_sn(&dev, serials[i]) != AIRSPY_SUCCESS)
         {
-            devices_[i]->unavailable = true;
-            devices_[i]->name += " (Unavailable)";
+            devices[i]->unavailable = true;
+            devices[i]->name += " (Unavailable)";
             continue;
         }
 
         if (airspy_board_id_read(dev, &board_id) == AIRSPY_SUCCESS)
         {
-            devices_[i]->name = airspy_board_id_name(static_cast<airspy_board_id>(board_id));
+            devices[i]->name = airspy_board_id_name(static_cast<airspy_board_id>(board_id));
         }
 
         if (airspy_board_partid_serialno_read(dev, &read_partid_serialno) == AIRSPY_SUCCESS)
         {
-            devices_[i]->serial = string_format("%08X%08X",
-                                                read_partid_serialno.serial_no[2],
-                                                read_partid_serialno.serial_no[3]);
+            devices[i]->serial = string_format("%08X%08X",
+                                               read_partid_serialno.serial_no[2],
+                                               read_partid_serialno.serial_no[3]);
 
             // FIXME: Why is .c_str() / .data() needed here?
             // If not, the string memory is messed up.
-            devices_[i]->name += string_format(" SN: %s", devices_[i]->serial.c_str());
+            devices[i]->name += string_format(" SN: %s", devices[i]->serial.c_str());
         }
 
         airspy_close(dev);
     }
-}
-
-const std::vector<std::shared_ptr<PortSDR::Device>>& PortSDR::AirSpyHost::Devices() const
-{
-    return devices_;
+    return devices;
 }
 
 std::unique_ptr<PortSDR::Stream> PortSDR::AirSpyHost::CreateStream() const

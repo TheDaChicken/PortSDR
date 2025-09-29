@@ -5,7 +5,7 @@
 #include <PortSDR.h>
 #include <gtest/gtest.h>
 
-TEST(AnyTest, Stream)
+TEST(AnyTest, Devices)
 {
     PortSDR::PortSDR sdr;
 
