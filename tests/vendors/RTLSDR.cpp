@@ -53,7 +53,7 @@ TEST(RTLSDR, Stream)
               0) << "Failed to set callback";
 
 
-    ASSERT_EQ(stream->SetSampleFormat(PortSDR::SAMPLE_FORMAT_IQ_INT16), 0) << "Failed to set sample format";
+    ASSERT_EQ(stream->SetSampleFormat(PortSDR::SAMPLE_FORMAT_IQ_UINT8), 0) << "Failed to set sample format";
     ASSERT_EQ(stream->Start(), 0) << "Failed to start stream";
 
     std::this_thread::sleep_for(std::chrono::seconds{1});

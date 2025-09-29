@@ -61,9 +61,6 @@ namespace PortSDR
 
         std::thread m_thread;
 
-        SampleFormat m_sampleFormat{SAMPLE_FORMAT_IQ_UINT8};
-        IQConverterUINT8ToINT16 uint8ToInt16;
-
         std::vector<char> m_outputBuffer;
     };
 }

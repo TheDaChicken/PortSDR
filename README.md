@@ -205,7 +205,7 @@ stream->SetSampleFormat(PortSDR::SAMPLE_FORMAT_IQ_INT16);
 
 Currently supported formats from SDR vendors:
 
-- RTLSDR: 8-bit (uint8_t), 16-bit (with automatic conversion)
+- RTLSDR: 8-bit (uint8_t)
 - AIRSPY: 16-bit (int16_t), 32-bit (float)
 
 ## Goals 

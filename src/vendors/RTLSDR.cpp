@@ -21,7 +21,6 @@
 
 PortSDR::RTLHost::RTLHost() : Host(RTL_SDR)
 {
-
 }
 
 std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::RTLHost::Devices() const
@@ -145,13 +144,9 @@ int PortSDR::RTLStream::SetSampleRate(uint32_t freq)
 
 int PortSDR::RTLStream::SetSampleFormat(SampleFormat type)
 {
-    if (type == SAMPLE_FORMAT_IQ_INT16)
-    {
-        m_outputBuffer.resize(BUF_LEN * sizeof(int16_t));
-        m_sampleFormat = type;
-    }
-
-    return 0;
+    if (type == SAMPLE_FORMAT_IQ_UINT8)
+        return 0;
+    return -1;
 }
 
 int PortSDR::RTLStream::SetIfGain(double gain)
@@ -270,7 +265,8 @@ double PortSDR::RTLStream::GetGain() const
 
 double PortSDR::RTLStream::GetGain(std::string_view name) const
 {
-    if ( "LNA" == name ) {
+    if ("LNA" == name)
+    {
         return GetGain();
     }
 
@@ -345,7 +341,7 @@ std::vector<std::string> PortSDR::RTLStream::GetGainModes() const
 
 std::vector<PortSDR::SampleFormat> PortSDR::RTLStream::GetSampleFormats() const
 {
-    return {SAMPLE_FORMAT_IQ_UINT8, SAMPLE_FORMAT_IQ_INT16};
+    return {SAMPLE_FORMAT_IQ_UINT8};
 }
 
 void PortSDR::RTLStream::RTLSDRCallback(unsigned char* buf, uint32_t len, void* ctx)
@@ -355,26 +351,11 @@ void PortSDR::RTLStream::RTLSDRCallback(unsigned char* buf, uint32_t len, void* 
 
     SDRTransfer transfer{};
 
-    transfer.format = obj->m_sampleFormat;
+    transfer.format = SAMPLE_FORMAT_IQ_UINT8;
+    transfer.data = buf;
+    transfer.frame_size = len / 2;
 
-    if (obj->m_sampleFormat == SAMPLE_FORMAT_IQ_UINT8)
-    {
-        transfer.data = buf;
-        transfer.frame_size = len / 2;
-
-        obj->m_callback(transfer);
-    }
-    else if (obj->m_sampleFormat == SAMPLE_FORMAT_IQ_INT16)
-    {
-        obj->uint8ToInt16.Process(buf,
-                                  reinterpret_cast<int16_t*>(obj->m_outputBuffer.data()),
-                                  len);
-
-        transfer.data = obj->m_outputBuffer.data();
-        transfer.frame_size = len / 2;
-
-        obj->m_callback(transfer);
-    }
+    obj->m_callback(transfer);
 }
 
 void PortSDR::RTLStream::Process()
