@@ -5,9 +5,7 @@ if (PKG_CONFIG_FOUND)
     pkg_check_modules(PC_RTLSDR rtlsdr QUIET)
 endif ()
 
-if (NOT LIBUSB_FOUND)
-    find_package(LIBUSB REQUIRED)
-endif ()
+find_package(LIBUSB REQUIRED)
 
 find_path(RTLSDR_INCLUDE_DIR
         rtl-sdr.h

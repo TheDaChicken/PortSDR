@@ -13,9 +13,7 @@ if (NOT LIBAIRSPY_FOUND)
         set(LIBAIRSPY_LIBRARIES "${LIBAIRSPY_PREFIX}/lib/libairspy.a")
     endif ()
 
-    if (NOT LIBUSB_FOUND)
-        find_package(LIBUSB REQUIRED)
-    endif ()
+    find_package(LIBUSB REQUIRED)
 
     # must be external project because of the uninstall target in the CMakeLists.txt
     ExternalProject_Add(LibAirSpyExternal
