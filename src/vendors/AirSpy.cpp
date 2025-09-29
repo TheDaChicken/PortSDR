@@ -32,6 +32,9 @@ std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::AirSpyHost::AvailableDevi
         uint8_t board_id;
         airspy_read_partid_serialno_t read_partid_serialno;
 
+        if (airspy_open_sn(&dev, serials[i]) != AIRSPY_SUCCESS)
+            continue;
+
         auto& device = devices[dev_id++];
 
         device = std::make_shared<Device>();
@@ -39,9 +42,6 @@ std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::AirSpyHost::AvailableDevi
         device->serial.clear();
         device->name = "AIRSPY";
         device->host = this;
-
-        if (airspy_open_sn(&dev, serials[i]) != AIRSPY_SUCCESS)
-            continue;
 
         if (airspy_board_id_read(dev, &board_id) == AIRSPY_SUCCESS)
         {
@@ -51,8 +51,8 @@ std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::AirSpyHost::AvailableDevi
         if (airspy_board_partid_serialno_read(dev, &read_partid_serialno) == AIRSPY_SUCCESS)
         {
             device->serial = string_format("%08X%08X",
-                                               read_partid_serialno.serial_no[2],
-                                               read_partid_serialno.serial_no[3]);
+                                           read_partid_serialno.serial_no[2],
+                                           read_partid_serialno.serial_no[3]);
 
             // FIXME: Why is .c_str() / .data() needed here?
             // If not, the string memory is messed up.

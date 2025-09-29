@@ -43,10 +43,10 @@ std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::RTLHost::AvailableDevices
         memset(product, 0, sizeof(product));
         memset(serial, 0, sizeof(serial));
 
-        auto& device = devices[dev_id++];
-
         if (rtlsdr_open(&dev, i) < 0)
             continue;
+
+        auto& device = devices[dev_id++];
 
         device = std::make_shared<Device>();
         device->index = i;
