@@ -16,8 +16,6 @@
 #include "vendors/AirSpyHf.h"
 #endif
 
-std::vector<std::shared_ptr<PortSDR::Host>> m_hosts;
-
 std::string PortSDR::PortSDR::GetVersion()
 {
     return kGitHash;
@@ -60,11 +58,11 @@ std::shared_ptr<PortSDR::Host> PortSDR::PortSDR::GetHost(Host::HostType name)
     return {};
 }
 
-std::shared_ptr<PortSDR::Device> PortSDR::PortSDR::GetFirstAvailableSDR()
+std::optional<PortSDR::Device> PortSDR::PortSDR::GetFirstAvailableSDR()
 {
     for (const auto& host : m_hosts)
     {
-        const std::vector<std::shared_ptr<Device>>& devices = host->AvailableDevices();
+        const std::vector<Device> devices = host->AvailableDevices();
         if (!devices.empty())
         {
             return devices.front();
@@ -73,36 +71,18 @@ std::shared_ptr<PortSDR::Device> PortSDR::PortSDR::GetFirstAvailableSDR()
     return {};
 }
 
-std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::PortSDR::GetDevices()
+std::vector<PortSDR::Device> PortSDR::PortSDR::GetDevices()
 {
-    std::vector<std::shared_ptr<Device>> total_devices;
+    std::vector<Device> total_devices;
     for (const auto& host : m_hosts)
     {
         const auto host_devices = host->AvailableDevices();
-        total_devices.insert(total_devices.end(), host_devices.begin(), host_devices.end());
+        total_devices.insert(
+            total_devices.end(),
+            host_devices.begin(), host_devices.end());
     }
 
     return total_devices;
-}
-
-double PortSDR::MetaRange::max() const
-{
-    double max_stop = this->front().stop;
-    for (const Range& r : (*this))
-    {
-        max_stop = std::max(max_stop, r.stop);
-    }
-    return max_stop;
-}
-
-double PortSDR::MetaRange::min() const
-{
-    double min_start = this->front().start;
-    for (const Range& r : *this)
-    {
-        min_start = std::min(min_start, r.start);
-    }
-    return min_start;
 }
 
 int PortSDR::Device::CreateStream(std::unique_ptr<Stream>& stream) const
@@ -110,25 +90,45 @@ int PortSDR::Device::CreateStream(std::unique_ptr<Stream>& stream) const
     if (!host)
         return {};
 
-    return host->CreateAndInitializeStream(std::make_unique<Device>(*this), stream);
+    return host->CreateAndInitializeStream(*this, stream);
 }
 
-int PortSDR::Host::CreateAndInitializeStream(const std::shared_ptr<Device>& device,
+int PortSDR::Host::CreateAndInitializeStream(const Device& device,
                                              std::unique_ptr<Stream>& stream) const
 {
-    auto newStream = CreateStream();
-    const int ret = newStream->Initialize(device);
+    auto new_stream = CreateStream();
+    const int ret = new_stream->Initialize(device);
 
     if (ret < 0)
     {
-        return ret; // Initialization failed, stream is not assigned
+        return ret;
     }
 
-    stream = std::move(newStream); // Transfer ownership to the caller
+    stream = std::move(new_stream);
     return ret;
 }
 
-double PortSDR::MetaRange::step() const
+double PortSDR::MetaRange::Max() const
+{
+    double max_stop = front().stop;
+    for (const Range& r : (*this))
+    {
+        max_stop = std::max(max_stop, r.stop);
+    }
+    return max_stop;
+}
+
+double PortSDR::MetaRange::Min() const
+{
+    double min_start = front().start;
+    for (const Range& r : *this)
+    {
+        min_start = std::min(min_start, r.start);
+    }
+    return min_start;
+}
+
+double PortSDR::MetaRange::Step() const
 {
     std::vector<double> non_zero_steps;
     Range last = this->front();
@@ -145,4 +145,3 @@ double PortSDR::MetaRange::step() const
     if (non_zero_steps.empty()) return 0; //all zero steps, its zero...
     return *std::min_element(non_zero_steps.begin(), non_zero_steps.end());
 }
-

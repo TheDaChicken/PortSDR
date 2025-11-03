@@ -9,7 +9,7 @@
 TEST(AirSpy, Devices)
 {
     PortSDR::PortSDR portSDR;
-    std::shared_ptr<PortSDR::Host> sdrHost = portSDR.GetHost(PortSDR::Host::AIRSPY);
+    const std::shared_ptr<PortSDR::Host> sdrHost = portSDR.GetHost(PortSDR::Host::AIRSPY);
 
     ASSERT_TRUE(sdrHost);
 
@@ -23,7 +23,7 @@ TEST(AirSpy, Devices)
 
     for (const auto& device : devices)
     {
-        std::cout << device->name << std::endl;
+        std::cout << device.name << std::endl;
     }
 }
 
@@ -34,7 +34,7 @@ TEST(AirSpy, Stream)
 
     ASSERT_TRUE(sdrHost);
 
-    const std::vector<std::shared_ptr<PortSDR::Device>>& devices = sdrHost->AvailableDevices();
+    const std::vector<PortSDR::Device>& devices = sdrHost->AvailableDevices();
 
     ASSERT_TRUE(!devices.empty());
 
@@ -61,11 +61,11 @@ TEST(AirSpy, Stream)
     // Test Gain
     const auto gainRange = stream->GetGainStage();
 
-    ASSERT_EQ(stream->SetGain(gainRange.range.min()), 0) << "Failed to set gain";
-    ASSERT_EQ(stream->SetGain(gainRange.range.max()), 0) << "Failed to set gain";
+    ASSERT_EQ(stream->SetGain(gainRange.range.Min()), 0) << "Failed to set gain";
+    ASSERT_EQ(stream->SetGain(gainRange.range.Max()), 0) << "Failed to set gain";
 
-    // Test Frequency. Tune to 100.7 MHz (WZLX)
-    ASSERT_EQ(stream->SetCenterFrequency(100.7e6, 0), 0) << "Failed to set frequency";
+    // Test Frequency. Tune to some rando frequency.
+    ASSERT_EQ(stream->SetCenterFrequency(100.7e6), 0) << "Failed to set frequency";
 
     std::this_thread::sleep_for(std::chrono::seconds{1});
 

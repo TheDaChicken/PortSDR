@@ -15,7 +15,7 @@ namespace PortSDR
     public:
         AirSpyHost();
 
-        [[nodiscard]] std::vector<std::shared_ptr<Device>> AvailableDevices() const override;
+        [[nodiscard]] std::vector<Device> AvailableDevices() const override;
         [[nodiscard]] std::unique_ptr<Stream> CreateStream() const override;
     };
 
@@ -24,11 +24,11 @@ namespace PortSDR
     public:
         ~AirSpyStream() override;
 
-        int Initialize(const std::shared_ptr<Device>& device) override;
+        int Initialize(const Device& device) override;
 
         int Start() override;
         int Stop() override;
-        int SetCenterFrequency(uint32_t freq, int stream) override;
+        int SetCenterFrequency(uint32_t freq) override;
         int SetSampleRate(uint32_t sampleRate) override;
         int SetGain(double gain) override;
         int SetSampleFormat(SampleFormat format) override;
@@ -51,7 +51,7 @@ namespace PortSDR
         [[nodiscard]] uint32_t GetSampleRate() const override;
         [[nodiscard]] double GetGain() const override;
         [[nodiscard]] double GetGain(std::string_view name) const override;
-        [[nodiscard]] const std::string GetGainMode() const override;
+        [[nodiscard]] std::string GetGainMode() const override;
 
     private:
         static int AirSpySDRCallback(airspy_transfer* transfer);

@@ -29,7 +29,8 @@ namespace PortSDR
 
         virtual ~Host() = default;
 
-        [[nodiscard]] virtual std::vector<std::shared_ptr<Device>> AvailableDevices() const = 0;
+        [[nodiscard]] virtual std::vector<Device> AvailableDevices() const = 0;
+        [[nodiscard]] virtual std::unique_ptr<Stream> CreateStream() const = 0;
 
         [[nodiscard]] HostType GetType() const
         {
@@ -42,12 +43,12 @@ namespace PortSDR
             {
             case RTL_SDR: return "RTL-SDR";
             case AIRSPY: return "AirSpy";
+            default:
+                return "Unknown"; // Should not happen
             }
-            return "Unknown"; // Should not happen
         }
 
-        [[nodiscard]] virtual std::unique_ptr<Stream> CreateStream() const = 0;
-        int CreateAndInitializeStream(const std::shared_ptr<Device>& device,
+        int CreateAndInitializeStream(const Device& device,
                                       std::unique_ptr<Stream>& stream) const;
 
     private:

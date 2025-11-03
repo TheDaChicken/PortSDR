@@ -5,6 +5,7 @@
 #ifndef PORTSDR_RANGES_H
 #define PORTSDR_RANGES_H
 
+#include <vector>
 #include <string>
 #include <utility>
 
@@ -12,12 +13,12 @@ namespace PortSDR
 {
     struct Range
     {
-        explicit Range(double value = 0)
+        explicit Range(const double value = 0)
             : start(value), stop(value), step(0)
         {
         }
 
-        Range(double start, double stop, double step)
+        Range(const double start, const double stop, const double step)
             : start(start), stop(stop), step(step)
         {
         }
@@ -35,27 +36,21 @@ namespace PortSDR
         {
         }
 
-        MetaRange(double start, double stop, double step)
-            : std::vector<Range>(1, Range(start, stop, step))
-        {
-        }
-
-        /*!
-        * Input iterator constructor:
-        * Makes boost::assign::list_of work.
-        * \param first the beginning iterator
-        * \param last the end iterator
-        */
         template <typename InputIterator>
         MetaRange(InputIterator first, InputIterator last):
             std::vector<Range>(first, last)
         {
-            /* NOP */
+
         }
 
-        [[nodiscard]] double step() const;
-        [[nodiscard]] double min() const;
-        [[nodiscard]] double max() const;
+        MetaRange(const double start, const double stop, const double step)
+            : std::vector<Range>(1, Range(start, stop, step))
+        {
+        }
+
+        [[nodiscard]] double Step() const;
+        [[nodiscard]] double Min() const;
+        [[nodiscard]] double Max() const;
     };
 
     struct Gain

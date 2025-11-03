@@ -10,7 +10,7 @@ TEST(AnyTest, Devices)
     PortSDR::PortSDR sdr;
 
     // Get the first available SDR device
-    const std::shared_ptr<PortSDR::Device> device = sdr.GetFirstAvailableSDR();
+    const std::optional<PortSDR::Device> device = sdr.GetFirstAvailableSDR();
 
     ASSERT_TRUE(device) << "No devices found";
 
@@ -39,8 +39,8 @@ TEST(AnyTest, Devices)
     for (const auto& gain : stream->GetGainStages())
     {
         std::cout << gain.stage << " ";
-        std::cout << gain.range.min() << " ";
-        std::cout << gain.range.max() << " ";
+        std::cout << gain.range.Min() << " ";
+        std::cout << gain.range.Max() << " ";
     }
     std::cout << std::endl;
 

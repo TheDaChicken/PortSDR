@@ -11,11 +11,11 @@
 TEST(RTLSDR, Devices)
 {
     PortSDR::PortSDR portSDR;
-    std::shared_ptr<PortSDR::Host> sdrHost = portSDR.GetHost(PortSDR::Host::RTL_SDR);
+    const std::shared_ptr<PortSDR::Host> sdrHost = portSDR.GetHost(PortSDR::Host::RTL_SDR);
 
     ASSERT_TRUE(sdrHost);
 
-    const std::vector<std::shared_ptr<PortSDR::Device>>& devices = sdrHost->AvailableDevices();
+    const std::vector<PortSDR::Device> devices = sdrHost->AvailableDevices();
 
     ASSERT_FALSE(devices.empty()) << "No devices found";
 
@@ -25,23 +25,23 @@ TEST(RTLSDR, Devices)
 
     for (const auto& device : devices)
     {
-        std::cout << device->name << std::endl;
+        std::cout << device.name << std::endl;
     }
 }
 
 TEST(RTLSDR, Stream)
 {
     PortSDR::PortSDR portSDR;
-    std::shared_ptr<PortSDR::Host> sdrHost = portSDR.GetHost(PortSDR::Host::RTL_SDR);
+    const std::shared_ptr<PortSDR::Host> sdrHost = portSDR.GetHost(PortSDR::Host::RTL_SDR);
 
     ASSERT_TRUE(sdrHost);
 
-    const std::vector<std::shared_ptr<PortSDR::Device>>& devices = sdrHost->AvailableDevices();
+    const std::vector<PortSDR::Device> devices = sdrHost->AvailableDevices();
 
     ASSERT_TRUE(!devices.empty());
 
     const auto& device = devices.front();
-    auto stream = sdrHost->CreateStream();
+    const auto stream = sdrHost->CreateStream();
 
     ASSERT_EQ(stream->Initialize(device), 0) << "Failed to initialize stream";
 

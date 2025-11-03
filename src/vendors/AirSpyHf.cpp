@@ -10,9 +10,9 @@ PortSDR::AirSpyHfHost::AirSpyHfHost() : Host(AIRSPY_HF)
 {
 }
 
-std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::AirSpyHfHost::AvailableDevices() const
+std::vector<PortSDR::Device> PortSDR::AirSpyHfHost::AvailableDevices() const
 {
-    std::vector<std::shared_ptr<Device>> devices;
+    std::vector<Device> devices;
 
     const int device_count = airspyhf_list_devices(nullptr, 0);
     if (device_count == 0)
@@ -37,21 +37,17 @@ std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::AirSpyHfHost::AvailableDe
 
         auto& device = devices[dev_id++];
 
-        device = std::make_shared<Device>();
-        device->index = serials[i];
-        device->serial.clear();
-        device->name = "AIRSPYHF";
-        device->host = this;
+        device.index = serials[i];
+        device.serial.clear();
+        device.name = "AIRSPYHF";
+        device.host = this;
 
         if (airspyhf_board_partid_serialno_read(dev, &read_partid_serialno) == AIRSPYHF_SUCCESS)
         {
-            device->serial = string_format("%08X%08X",
-                                           read_partid_serialno.serial_no[2],
-                                           read_partid_serialno.serial_no[3]);
-
-            // FIXME: Why is .c_str() / .data() needed here?
-            // If not, the string memory is messed up.
-            device->name += string_format(" SN: %s", devices[i]->serial.c_str());
+            device.serial = string_format("%08X%08X",
+                                          read_partid_serialno.serial_no[2],
+                                          read_partid_serialno.serial_no[3]);
+            device.name += string_format(" SN: %s", devices[i].serial.c_str());
         }
 
         airspyhf_close(dev);
@@ -74,12 +70,12 @@ PortSDR::AirSpyHfStream::~AirSpyHfStream()
     }
 }
 
-int PortSDR::AirSpyHfStream::Initialize(const std::shared_ptr<Device>& device)
+int PortSDR::AirSpyHfStream::Initialize(const Device& device)
 {
     if (m_device)
         return 0;
 
-    int ret = airspyhf_open_sn(&m_device, device->index);
+    int ret = airspyhf_open_sn(&m_device, device.index);
     if (ret != AIRSPYHF_SUCCESS)
     {
         return ret;
@@ -104,7 +100,7 @@ int PortSDR::AirSpyHfStream::Stop()
     return airspyhf_stop(m_device);
 }
 
-int PortSDR::AirSpyHfStream::SetCenterFrequency(uint32_t freq, int stream)
+int PortSDR::AirSpyHfStream::SetCenterFrequency(uint32_t freq)
 {
     if (!m_device)
         return -1;
@@ -236,7 +232,7 @@ double PortSDR::AirSpyHfStream::GetGain(std::string_view name) const
     return 0;
 }
 
-const std::string PortSDR::AirSpyHfStream::GetGainMode() const
+std::string PortSDR::AirSpyHfStream::GetGainMode() const
 {
     return ""; // AirSpy HF does not support gain modes
 }

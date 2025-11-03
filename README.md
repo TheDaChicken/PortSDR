@@ -6,7 +6,7 @@ designed to support many SDR vendors.
 ## Why not use SoapySDR instead?
 
 SoapySDR is a great library for interfacing with SDR devices.
-However, it is not very easy to use:
+However, it is not very easy to use for general-users:
 
 - it's a plugin based system.
 - It requires compiling/installing a plugin for each vendor you want to use.
@@ -55,7 +55,7 @@ int main()
     PortSDR::PortSDR sdr;
 
     // Get the first available SDR device
-    const std::shared_ptr<PortSDR::Device> device = sdr.GetFirstAvailableSDR();
+    const std::optional<PortSDR::Device> device = sdr.GetFirstAvailableSDR();
     if (!device)
     {
         std::cerr << "There are no devices" << std::endl;
@@ -98,7 +98,7 @@ int main()
     PortSDR::PortSDR sdr;
     
     // Get the first available SDR device
-    const std::shared_ptr<PortSDR::Device> device = sdr.GetFirstAvailableSDR();
+    const std::optional<PortSDR::Device> device = sdr.GetFirstAvailableSDR();
     if (!device)
     {
         std::cerr << "There are no devices" << std::endl;
@@ -159,7 +159,7 @@ int main()
     // ... etc Open the device
     
     // Create Stream
-    std::unique_ptr<PortSDR::Stream> stream = device->CreateStream();
+    std::unique_ptr<PortSDR::Stream> stream = device.CreateStream();
     
     // Set callback
     stream->SetCallback([](PortSDR::SDRTransfer& transfer)

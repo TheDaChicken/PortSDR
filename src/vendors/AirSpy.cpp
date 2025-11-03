@@ -2,7 +2,7 @@
 // Created by TheDaChicken on 12/17/2024.
 //
 
-#include "../../include/vendors/AirSpy.h"
+#include "vendors/AirSpy.h"
 #include "libairspy/airspy.h"
 
 #include <Utils.h>
@@ -13,9 +13,9 @@ PortSDR::AirSpyHost::AirSpyHost() : Host(AIRSPY)
 {
 }
 
-std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::AirSpyHost::AvailableDevices() const
+std::vector<PortSDR::Device> PortSDR::AirSpyHost::AvailableDevices() const
 {
-    std::vector<std::shared_ptr<Device>> devices;
+    std::vector<Device> devices;
 
     uint64_t serials[AIRSPY_MAX_DEVICE + 1];
     int device_count = airspy_list_devices(serials, AIRSPY_MAX_DEVICE);
@@ -37,26 +37,22 @@ std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::AirSpyHost::AvailableDevi
 
         auto& device = devices[dev_id++];
 
-        device = std::make_shared<Device>();
-        device->index = serials[i];
-        device->serial.clear();
-        device->name = "AIRSPY";
-        device->host = this;
+        device.index = serials[i];
+        device.serial.clear();
+        device.name = "AIRSPY";
+        device.host = this;
 
         if (airspy_board_id_read(dev, &board_id) == AIRSPY_SUCCESS)
         {
-            device->name = airspy_board_id_name(static_cast<airspy_board_id>(board_id));
+            device.name = airspy_board_id_name(static_cast<airspy_board_id>(board_id));
         }
 
         if (airspy_board_partid_serialno_read(dev, &read_partid_serialno) == AIRSPY_SUCCESS)
         {
-            device->serial = string_format("%08X%08X",
-                                           read_partid_serialno.serial_no[2],
-                                           read_partid_serialno.serial_no[3]);
-
-            // FIXME: Why is .c_str() / .data() needed here?
-            // If not, the string memory is messed up.
-            device->name += string_format(" SN: %s", devices[i]->serial.c_str());
+            device.serial = string_format("%08X%08X",
+                                          read_partid_serialno.serial_no[2],
+                                          read_partid_serialno.serial_no[3]);
+            device.name += string_format(" SN: %s", devices[i].serial.c_str());
         }
 
         airspy_close(dev);
@@ -79,16 +75,14 @@ PortSDR::AirSpyStream::~AirSpyStream()
     }
 }
 
-int PortSDR::AirSpyStream::Initialize(const std::shared_ptr<Device>& device)
+int PortSDR::AirSpyStream::Initialize(const Device& device)
 {
     if (m_device)
         return 0;
 
-    int ret = airspy_open_sn(&m_device, device->index);
+    int ret = airspy_open_sn(&m_device, device.index);
     if (ret != AIRSPY_SUCCESS)
-    {
         return ret;
-    }
 
     ret = SetSampleFormat(SAMPLE_FORMAT_IQ_INT16);
     if (ret != AIRSPY_SUCCESS)
@@ -118,7 +112,7 @@ int PortSDR::AirSpyStream::Stop()
     return airspy_stop_rx(m_device);
 }
 
-int PortSDR::AirSpyStream::SetCenterFrequency(uint32_t freq, int stream)
+int PortSDR::AirSpyStream::SetCenterFrequency(uint32_t freq)
 {
     if (!m_device)
         return -1;
@@ -330,7 +324,7 @@ double PortSDR::AirSpyStream::GetGain(std::string_view name) const
     return 0.0;
 }
 
-const std::string PortSDR::AirSpyStream::GetGainMode() const
+std::string PortSDR::AirSpyStream::GetGainMode() const
 {
     return m_gainMode == LINEARITY ? "LINEARITY" : "SENSITIVITY";
 }

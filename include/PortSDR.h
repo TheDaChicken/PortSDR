@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <cstdint>
+#include <optional>
 
 #include "Host.h"
 
@@ -17,12 +18,14 @@ namespace PortSDR
 
         PortSDR();
 
-        std::shared_ptr<Device> GetFirstAvailableSDR();
+        std::optional<Device> GetFirstAvailableSDR();
 
         std::vector<std::shared_ptr<Host>> GetHosts();
-        std::vector<std::shared_ptr<Device>> GetDevices();
+        std::vector<Device> GetDevices();
 
         std::shared_ptr<Host> GetHost(Host::HostType name);
+    private:
+        std::vector<std::shared_ptr<Host>> m_hosts;
     };
 
     class IQConverterUINT8ToINT16

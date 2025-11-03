@@ -2,7 +2,7 @@
 // Created by TheDaChicken on 12/15/2024.
 //
 
-#include "../../include/vendors/RTLSDR.h"
+#include "vendors/RTLSDR.h"
 #include "rtl-sdr.h"
 
 #include <cassert>
@@ -23,9 +23,9 @@ PortSDR::RTLHost::RTLHost() : Host(RTL_SDR)
 {
 }
 
-std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::RTLHost::AvailableDevices() const
+std::vector<PortSDR::Device> PortSDR::RTLHost::AvailableDevices() const
 {
-    std::vector<std::shared_ptr<Device>> devices;
+    std::vector<Device> devices;
     const uint32_t device_count = rtlsdr_get_device_count();
 
     devices.resize(device_count);
@@ -48,15 +48,14 @@ std::vector<std::shared_ptr<PortSDR::Device>> PortSDR::RTLHost::AvailableDevices
 
         auto& device = devices[dev_id++];
 
-        device = std::make_shared<Device>();
-        device->index = i;
-        device->host = this;
-        device->serial.clear();
+        device.index = i;
+        device.host = this;
+        device.serial.clear();
 
         if (rtlsdr_get_usb_strings(dev, manufact, product, serial) == 0)
         {
-            device->serial = serial;
-            device->name = string_format("%s %s SN: %s", manufact, product, serial);
+            device.serial = serial;
+            device.name = string_format("%s %s SN: %s", manufact, product, serial);
         }
 
         rtlsdr_close(dev);
@@ -82,14 +81,14 @@ PortSDR::RTLStream::~RTLStream()
     m_dev = nullptr;
 }
 
-int PortSDR::RTLStream::Initialize(const std::shared_ptr<Device>& device)
+int PortSDR::RTLStream::Initialize(const Device& device)
 {
     int ret = 0;
 
     if (m_dev)
         return ret;
 
-    ret = rtlsdr_open(&m_dev, device->index);
+    ret = rtlsdr_open(&m_dev, device.index);
     if (ret < 0)
         return ret;
 
@@ -126,11 +125,8 @@ int PortSDR::RTLStream::Stop()
     return 0;
 }
 
-int PortSDR::RTLStream::SetCenterFrequency(uint32_t freq, int stream)
+int PortSDR::RTLStream::SetCenterFrequency(uint32_t freq)
 {
-    if (stream > 0)
-        return -1;
-
     return rtlsdr_set_center_freq(m_dev, freq);
 }
 
@@ -173,16 +169,16 @@ int PortSDR::RTLStream::SetIfGain(double gain)
     /* initialize with min gains */
     for (int i = 0; i < if_gains.size(); i++)
     {
-        gains[i + 1] = if_gains[i].min();
+        gains[i + 1] = if_gains[i].Min();
     }
 
     for (int i = static_cast<int>(if_gains.size() - 1); i >= 0; i--)
     {
         const MetaRange& range = if_gains[i];
         double error = gain;
-        double best_gain = range.min();
+        double best_gain = range.Min();
 
-        for (double g = range.min(); g <= range.max(); g += range.step())
+        for (double g = range.Min(); g <= range.Max(); g += range.Step())
         {
             // Test the gain for this stage and calculate the error
             gains[i + 1] = g;
@@ -273,7 +269,7 @@ double PortSDR::RTLStream::GetGain(std::string_view name) const
     return 0;
 }
 
-const std::string PortSDR::RTLStream::GetGainMode() const
+std::string PortSDR::RTLStream::GetGainMode() const
 {
     return "";
 }
@@ -346,7 +342,7 @@ std::vector<PortSDR::SampleFormat> PortSDR::RTLStream::GetSampleFormats() const
 
 void PortSDR::RTLStream::RTLSDRCallback(unsigned char* buf, uint32_t len, void* ctx)
 {
-    auto* obj = static_cast<RTLStream*>(ctx);
+    const auto* obj = static_cast<RTLStream*>(ctx);
     assert(obj != nullptr);
 
     SDRTransfer transfer{};
