@@ -18,7 +18,7 @@ if (NOT LIBAIRSPY_FOUND)
     # must be external project because of the uninstall target in the CMakeLists.txt
     ExternalProject_Add(LibAirSpyExternal
             GIT_REPOSITORY https://github.com/airspy/airspyone_host.git
-            GIT_TAG 0bccf3b88830d3e5ec029cfb42b9d4c2f2ec8554
+            GIT_TAG c6721000f19601512e9ba6b0340e5d9ced22a900
             PREFIX ${LIBAIRSPY_PREFIX}
             UPDATE_COMMAND ""
             BUILD_BYPRODUCTS ${LIBAIRSPY_LIBRARIES}
