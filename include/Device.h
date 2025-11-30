@@ -5,8 +5,8 @@
 #ifndef PORTSDR_DEVICE_H
 #define PORTSDR_DEVICE_H
 
-#include <string>
 #include <cstdint>
+#include <string>
 
 namespace PortSDR
 {
@@ -15,13 +15,16 @@ namespace PortSDR
 
     struct Device
     {
-        std::string name;
-        std::string serial;
-        uint64_t index;
-
-        const Host* host; // TODO: Change to std::shared_ptr<Host> or std::weak_ptr<Host> instead to avoid issues
+        uint32_t index;
+        const Host* host;
 
         int CreateStream(std::unique_ptr<Stream>& stream) const;
+    };
+
+    struct DeviceInfo
+    {
+        std::string name;
+        std::string serial;
     };
 }
 

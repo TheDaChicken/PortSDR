@@ -26,7 +26,7 @@ else ()
     set(LIBRARY_BUILD_TYPE STATIC)
 endif ()
 
-include(cmake/CheckVersion.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/CheckVersion.cmake)
 
 set(PortSDR_LIBRARIES "")
 set(PortSDR_VENDOR_FILES "")

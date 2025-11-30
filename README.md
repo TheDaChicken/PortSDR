@@ -62,8 +62,7 @@ int main()
         return 1;
     }
     
-    std::cout << "Device: " << device->name << std::endl;
-    std::cout << "Serial: " << device->serial << std::endl;
+    std::cout << "Index: " << device->index << std::endl;
     
     // Open the stream from the device
     std::unique_ptr<PortSDR::Stream> stream;
@@ -74,6 +73,8 @@ int main()
         std::cerr << "Failed to open the device" << std::endl;
         return 1;
     }
+    
+    std::cout << "Name: " << stream->GetUSBStrings().name << std::endl;
     
     return 0;
 }

@@ -90,14 +90,14 @@ int PortSDR::Device::CreateStream(std::unique_ptr<Stream>& stream) const
     if (!host)
         return {};
 
-    return host->CreateAndInitializeStream(*this, stream);
+    return host->CreateAndInitializeStream(index, stream);
 }
 
-int PortSDR::Host::CreateAndInitializeStream(const Device& device,
+int PortSDR::Host::CreateAndInitializeStream(const uint32_t index,
                                              std::unique_ptr<Stream>& stream) const
 {
     auto new_stream = CreateStream();
-    const int ret = new_stream->Initialize(device);
+    const int ret = new_stream->Initialize(index);
 
     if (ret < 0)
     {

@@ -30,39 +30,35 @@ std::vector<PortSDR::Device> PortSDR::RTLHost::AvailableDevices() const
 
     devices.resize(device_count);
 
-    int dev_id = 0;
-
     for (int i = 0; i < device_count; i++)
     {
-        rtlsdr_dev_t* dev = nullptr;
-        char manufact[MAX_STR_SIZE];
-        char product[MAX_STR_SIZE];
-        char serial[MAX_STR_SIZE];
-
-        memset(manufact, 0, sizeof(manufact));
-        memset(product, 0, sizeof(product));
-        memset(serial, 0, sizeof(serial));
-
-        if (rtlsdr_open(&dev, i) < 0)
-            continue;
-
-        auto& device = devices[dev_id++];
+        auto& device = devices[i];
 
         device.index = i;
         device.host = this;
-        device.serial.clear();
+    }
+    return devices;
+}
 
-        if (rtlsdr_get_usb_strings(dev, manufact, product, serial) == 0)
-        {
-            device.serial = serial;
-            device.name = string_format("%s %s SN: %s", manufact, product, serial);
-        }
+PortSDR::DeviceInfo PortSDR::RTLStream::GetUSBStrings()
+{
+    DeviceInfo device;
 
-        rtlsdr_close(dev);
+    char manufact[MAX_STR_SIZE];
+    char product[MAX_STR_SIZE];
+    char serial[MAX_STR_SIZE];
+
+    memset(manufact, 0, sizeof(manufact));
+    memset(product, 0, sizeof(product));
+    memset(serial, 0, sizeof(serial));
+
+    if (rtlsdr_get_usb_strings(m_dev, manufact, product, serial) == 0)
+    {
+        device.serial = serial;
+        device.name = string_format("%s %s SN: %s", manufact, product, serial);
     }
 
-    devices.resize(dev_id);
-    return devices;
+    return device;
 }
 
 std::unique_ptr<PortSDR::Stream> PortSDR::RTLHost::CreateStream() const
@@ -81,14 +77,14 @@ PortSDR::RTLStream::~RTLStream()
     m_dev = nullptr;
 }
 
-int PortSDR::RTLStream::Initialize(const Device& device)
+int PortSDR::RTLStream::Initialize(const uint32_t index)
 {
     int ret = 0;
 
     if (m_dev)
         return ret;
 
-    ret = rtlsdr_open(&m_dev, device.index);
+    ret = rtlsdr_open(&m_dev, index);
     if (ret < 0)
         return ret;
 

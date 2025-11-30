@@ -5,14 +5,13 @@
 #ifndef PORTSDR_STREAM_H
 #define PORTSDR_STREAM_H
 
+#include <cstdint>
 #include <functional>
 
 #include "Ranges.h"
 
 namespace PortSDR
 {
-    struct Device;
-
     enum SampleFormat
     {
         SAMPLE_FORMAT_IQ_UINT8,
@@ -36,7 +35,28 @@ namespace PortSDR
         Stream() = default;
         virtual ~Stream() = default;
 
-        virtual int Initialize(const Device& device) = 0;
+        /**
+         * Opens device
+         * @param device device container
+         * @return status code.
+         */
+        virtual int Initialize(uint32_t index) = 0;
+
+        /**
+         * Opens device
+         * @param device device container
+         * @return status code.
+         */
+        virtual int Initialize(const Device& device)
+        {
+            return Initialize(device.index);
+        };
+
+        /**
+         * Gets
+         * @return
+         */
+        virtual DeviceInfo GetUSBStrings() = 0;
 
         /**
          * Starts streaming of the SDR samples

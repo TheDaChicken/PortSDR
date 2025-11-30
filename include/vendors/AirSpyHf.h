@@ -24,7 +24,8 @@ namespace PortSDR
     public:
         ~AirSpyHfStream() override;
 
-        int Initialize(const Device& device) override;
+        int Initialize(uint32_t index) override;
+        DeviceInfo GetUSBStrings() override;
 
         int Start() override;
         int Stop() override;
@@ -57,6 +58,7 @@ namespace PortSDR
 
         static int AirSpySDRCallback(airspyhf_transfer_t* transfer);
 
+    private:
         airspyhf_device *m_device = nullptr;
 
         uint32_t m_freq = 0;

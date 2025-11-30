@@ -48,7 +48,7 @@ namespace PortSDR
             }
         }
 
-        int CreateAndInitializeStream(const Device& device,
+        int CreateAndInitializeStream(const uint32_t index,
                                       std::unique_ptr<Stream>& stream) const;
 
     private:

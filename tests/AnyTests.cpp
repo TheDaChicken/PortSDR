@@ -14,8 +14,7 @@ TEST(AnyTest, Devices)
 
     ASSERT_TRUE(device) << "No devices found";
 
-    std::cout << "Device: " << device->name << std::endl;
-    std::cout << "Serial: " << device->serial << std::endl;
+    std::cout << "Index: " << device->index << std::endl;
 
     // Open the device
     std::unique_ptr<PortSDR::Stream> stream;
@@ -26,6 +25,9 @@ TEST(AnyTest, Devices)
         std::cerr << "Failed to open the device" << std::endl;
         return;
     }
+
+    // Print the Serial
+    std::cout << "Name: " << stream->GetUSBStrings().name << std::endl;
 
     // Print the capabilities
     std::cout << "Sample rates: ";

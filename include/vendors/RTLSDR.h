@@ -26,7 +26,10 @@ namespace PortSDR
     public:
         ~RTLStream() override;
 
-        int Initialize(const Device& device) override;
+        int Initialize(uint32_t index) override;
+
+        DeviceInfo GetUSBStrings() override;
+
         int Start() override;
         int Stop() override;
 
@@ -57,6 +60,7 @@ namespace PortSDR
         static void RTLSDRCallback(unsigned char* buf, uint32_t len, void* ctx);
         void Process();
 
+    private:
         rtlsdr_dev_t* m_dev{nullptr};
         std::thread m_thread;
     };

@@ -25,35 +25,13 @@ std::vector<PortSDR::Device> PortSDR::AirSpyHfHost::AvailableDevices() const
 
     devices.resize(device_count);
 
-    int dev_id = 0;
-
     for (int i = 0; i < device_count; ++i)
     {
-        airspyhf_device* dev = nullptr;
-        airspyhf_read_partid_serialno_t read_partid_serialno;
-
-        if (airspyhf_open_sn(&dev, serials[i]) != AIRSPYHF_SUCCESS)
-            continue;
-
-        auto& device = devices[dev_id++];
+        auto& device = devices[i];
 
         device.index = serials[i];
-        device.serial.clear();
-        device.name = "AIRSPYHF";
         device.host = this;
-
-        if (airspyhf_board_partid_serialno_read(dev, &read_partid_serialno) == AIRSPYHF_SUCCESS)
-        {
-            device.serial = string_format("%08X%08X",
-                                          read_partid_serialno.serial_no[2],
-                                          read_partid_serialno.serial_no[3]);
-            device.name += string_format(" SN: %s", devices[i].serial.c_str());
-        }
-
-        airspyhf_close(dev);
     }
-
-    devices.resize(dev_id);
     return devices;
 }
 
@@ -70,18 +48,36 @@ PortSDR::AirSpyHfStream::~AirSpyHfStream()
     }
 }
 
-int PortSDR::AirSpyHfStream::Initialize(const Device& device)
+int PortSDR::AirSpyHfStream::Initialize(const uint32_t index)
 {
     if (m_device)
         return 0;
 
-    int ret = airspyhf_open_sn(&m_device, device.index);
+    int ret = airspyhf_open_sn(&m_device, index);
     if (ret != AIRSPYHF_SUCCESS)
     {
         return ret;
     }
 
     return 0;
+}
+
+PortSDR::DeviceInfo PortSDR::AirSpyHfStream::GetUSBStrings()
+{
+    DeviceInfo device;
+    airspyhf_read_partid_serialno_t read_partid_serialno;
+
+    if (airspyhf_board_partid_serialno_read(
+        m_device,
+        &read_partid_serialno) == AIRSPYHF_SUCCESS)
+    {
+        device.serial = string_format("%08X%08X",
+                                      read_partid_serialno.serial_no[2],
+                                      read_partid_serialno.serial_no[3]);
+        device.name += string_format(" SN: %s", device.serial.c_str());
+    }
+
+    return device;
 }
 
 int PortSDR::AirSpyHfStream::Start()

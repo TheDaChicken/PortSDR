@@ -24,41 +24,13 @@ std::vector<PortSDR::Device> PortSDR::AirSpyHost::AvailableDevices() const
 
     devices.resize(device_count);
 
-    int dev_id = 0;
-
     for (int i = 0; i < device_count; i++)
     {
-        airspy_device* dev = nullptr;
-        uint8_t board_id;
-        airspy_read_partid_serialno_t read_partid_serialno;
-
-        if (airspy_open_sn(&dev, serials[i]) != AIRSPY_SUCCESS)
-            continue;
-
-        auto& device = devices[dev_id++];
+        auto& device = devices[i];
 
         device.index = serials[i];
-        device.serial.clear();
-        device.name = "AIRSPY";
         device.host = this;
-
-        if (airspy_board_id_read(dev, &board_id) == AIRSPY_SUCCESS)
-        {
-            device.name = airspy_board_id_name(static_cast<airspy_board_id>(board_id));
-        }
-
-        if (airspy_board_partid_serialno_read(dev, &read_partid_serialno) == AIRSPY_SUCCESS)
-        {
-            device.serial = string_format("%08X%08X",
-                                          read_partid_serialno.serial_no[2],
-                                          read_partid_serialno.serial_no[3]);
-            device.name += string_format(" SN: %s", devices[i].serial.c_str());
-        }
-
-        airspy_close(dev);
     }
-
-    devices.resize(dev_id);
     return devices;
 }
 
@@ -70,17 +42,15 @@ std::unique_ptr<PortSDR::Stream> PortSDR::AirSpyHost::CreateStream() const
 PortSDR::AirSpyStream::~AirSpyStream()
 {
     if (m_device)
-    {
         airspy_close(m_device);
-    }
 }
 
-int PortSDR::AirSpyStream::Initialize(const Device& device)
+int PortSDR::AirSpyStream::Initialize(const uint32_t index)
 {
     if (m_device)
         return 0;
 
-    int ret = airspy_open_sn(&m_device, device.index);
+    int ret = airspy_open_sn(&m_device, index);
     if (ret != AIRSPY_SUCCESS)
         return ret;
 
@@ -91,6 +61,31 @@ int PortSDR::AirSpyStream::Initialize(const Device& device)
     }
 
     return 0;
+}
+
+PortSDR::DeviceInfo PortSDR::AirSpyStream::GetUSBStrings()
+{
+    DeviceInfo device;
+
+    uint8_t board_id;
+    airspy_read_partid_serialno_t read_partid_serialno;
+
+    if (airspy_board_id_read(
+        m_device, &board_id) == AIRSPY_SUCCESS)
+    {
+        device.name = airspy_board_id_name(static_cast<airspy_board_id>(board_id));
+    }
+
+    if (airspy_board_partid_serialno_read(
+        m_device, &read_partid_serialno) == AIRSPY_SUCCESS)
+    {
+        device.serial = string_format("%08X%08X",
+                                      read_partid_serialno.serial_no[2],
+                                      read_partid_serialno.serial_no[3]);
+        device.name += string_format(" SN: %s", device.serial.c_str());
+    }
+
+    return device;
 }
 
 int PortSDR::AirSpyStream::Start()
@@ -170,7 +165,7 @@ int PortSDR::AirSpyStream::SetSampleFormat(SampleFormat format)
     if (sampleType == AIRSPY_SAMPLE_END)
         return -1; // Invalid sample format
 
-    int ret = airspy_set_sample_type(m_device, sampleType);
+    const int ret = airspy_set_sample_type(m_device, sampleType);
     if (ret != AIRSPY_SUCCESS)
         return ret;
 

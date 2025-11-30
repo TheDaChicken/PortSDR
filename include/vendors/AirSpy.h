@@ -24,7 +24,9 @@ namespace PortSDR
     public:
         ~AirSpyStream() override;
 
-        int Initialize(const Device& device) override;
+        int Initialize(uint32_t index) override;
+
+        DeviceInfo GetUSBStrings() override;
 
         int Start() override;
         int Stop() override;
@@ -57,6 +59,7 @@ namespace PortSDR
         static int AirSpySDRCallback(airspy_transfer* transfer);
         static airspy_sample_type ConvertToSampleType(SampleFormat format) ;
 
+    private:
         airspy_device* m_device = nullptr;
         SampleFormat m_sampleType = SAMPLE_FORMAT_IQ_FLOAT32;
         uint32_t m_sampleRate = 0;
