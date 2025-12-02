@@ -24,7 +24,7 @@ namespace PortSDR
     public:
         ~AirSpyStream() override;
 
-        int Initialize(uint32_t index) override;
+        int Initialize(std::string_view index) override;
 
         DeviceInfo GetUSBStrings() override;
 

@@ -28,7 +28,8 @@ std::vector<PortSDR::Device> PortSDR::AirSpyHost::AvailableDevices() const
     {
         auto& device = devices[i];
 
-        device.index = serials[i];
+        device.serial = string_format("%016llX",
+                                      serials[i]);
         device.host = this;
     }
     return devices;
@@ -45,12 +46,20 @@ PortSDR::AirSpyStream::~AirSpyStream()
         airspy_close(m_device);
 }
 
-int PortSDR::AirSpyStream::Initialize(const uint32_t index)
+int PortSDR::AirSpyStream::Initialize(const std::string_view index)
 {
     if (m_device)
         return 0;
 
-    int ret = airspy_open_sn(&m_device, index);
+    if (index.size() != 16)
+        return -1;
+
+    const uint64_t num = strtoull(
+        index.data(),
+        nullptr,
+        16);
+
+    int ret = airspy_open_sn(&m_device, num);
     if (ret != AIRSPY_SUCCESS)
         return ret;
 

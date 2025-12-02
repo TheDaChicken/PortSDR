@@ -26,7 +26,7 @@ namespace PortSDR
     public:
         ~RTLStream() override;
 
-        int Initialize(uint32_t index) override;
+        int Initialize(std::string_view serial) override;
 
         DeviceInfo GetUSBStrings() override;
 

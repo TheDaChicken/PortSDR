@@ -14,7 +14,7 @@ TEST(AnyTest, Devices)
 
     ASSERT_TRUE(device) << "No devices found";
 
-    std::cout << "Index: " << device->index << std::endl;
+    std::cout << "Serial: " << device->serial << std::endl;
 
     // Open the device
     std::unique_ptr<PortSDR::Stream> stream;

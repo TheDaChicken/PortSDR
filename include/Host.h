@@ -48,7 +48,7 @@ namespace PortSDR
             }
         }
 
-        int CreateAndInitializeStream(const uint32_t index,
+        int CreateAndInitializeStream(std::string_view serial,
                                       std::unique_ptr<Stream>& stream) const;
 
     private:

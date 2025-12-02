@@ -37,19 +37,19 @@ namespace PortSDR
 
         /**
          * Opens device
-         * @param device device container
+         * @param serial serial of the device.
          * @return status code.
          */
-        virtual int Initialize(uint32_t index) = 0;
+        virtual int Initialize(std::string_view serial) = 0;
 
         /**
          * Opens device
          * @param device device container
          * @return status code.
          */
-        virtual int Initialize(const Device& device)
+        int Initialize(const Device& device)
         {
-            return Initialize(device.index);
+            return Initialize(device.serial);
         };
 
         /**

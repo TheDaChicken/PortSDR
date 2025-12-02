@@ -15,7 +15,7 @@ namespace PortSDR
 
     struct Device
     {
-        uint32_t index;
+        std::string serial;
         const Host* host;
 
         int CreateStream(std::unique_ptr<Stream>& stream) const;

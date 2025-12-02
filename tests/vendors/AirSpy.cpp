@@ -23,7 +23,7 @@ TEST(AirSpy, Devices)
 
     for (const auto& device : devices)
     {
-        std::cout << device.index << std::endl;
+        std::cout << device.serial << std::endl;
     }
 }
 

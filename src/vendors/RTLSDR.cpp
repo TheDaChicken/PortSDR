@@ -30,13 +30,26 @@ std::vector<PortSDR::Device> PortSDR::RTLHost::AvailableDevices() const
 
     devices.resize(device_count);
 
+    int dev_id = 0;
+
     for (int i = 0; i < device_count; i++)
     {
-        auto& device = devices[i];
+        char serial[MAX_STR_SIZE];
 
-        device.index = i;
+        const int ret = rtlsdr_get_device_usb_strings(
+            i, nullptr, nullptr,
+            serial);
+        if (ret != 0)
+            continue;
+
+        auto& device = devices[dev_id++];
+
+        device.serial = serial;
         device.host = this;
     }
+
+    devices.resize(dev_id);
+
     return devices;
 }
 
@@ -77,11 +90,15 @@ PortSDR::RTLStream::~RTLStream()
     m_dev = nullptr;
 }
 
-int PortSDR::RTLStream::Initialize(const uint32_t index)
+int PortSDR::RTLStream::Initialize(const std::string_view serial)
 {
     int ret = 0;
 
     if (m_dev)
+        return ret;
+
+    const int index = rtlsdr_get_index_by_serial(serial.data());
+    if (index < 0)
         return ret;
 
     ret = rtlsdr_open(&m_dev, index);

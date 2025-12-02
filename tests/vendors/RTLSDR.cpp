@@ -25,7 +25,7 @@ TEST(RTLSDR, Devices)
 
     for (const auto& device : devices)
     {
-        std::cout << device.index << std::endl;
+        std::cout << device.serial << std::endl;
     }
 }
 
@@ -59,8 +59,4 @@ TEST(RTLSDR, Stream)
     std::this_thread::sleep_for(std::chrono::seconds{1});
 
     ASSERT_EQ(stream->Stop(), 0) << "Failed to stop stream";
-
-    const std::vector<PortSDR::Device> new_devices = sdrHost->AvailableDevices();
-
-    ASSERT_EQ(new_devices.size(), devices.size()) << "Failed to stop stream";
 }

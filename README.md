@@ -62,7 +62,7 @@ int main()
         return 1;
     }
     
-    std::cout << "Index: " << device->index << std::endl;
+    std::cout << "Serial: " << device->serial << std::endl;
     
     // Open the stream from the device
     std::unique_ptr<PortSDR::Stream> stream;
