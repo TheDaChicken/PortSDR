@@ -31,7 +31,7 @@ std::vector<PortSDR::Device> PortSDR::AirSpyHfHost::AvailableDevices() const
 
         device.serial = string_format("%016llX",
                                       serials[i]);
-        device.host = this;
+        device.host = shared_from_this();
     }
     return devices;
 }
@@ -49,13 +49,13 @@ PortSDR::AirSpyHfStream::~AirSpyHfStream()
     }
 }
 
-int PortSDR::AirSpyHfStream::Initialize(const std::string_view index)
+ErrorCode PortSDR::AirSpyHfStream::Initialize(const std::string_view index)
 {
     if (m_device)
-        return 0;
+        return ErrorCode::INVALID_ARGUMENT;
 
     if (index.size() != 16)
-        return -1;
+        return ErrorCode::INVALID_ARGUMENT;
 
     const uint64_t num = strtoull(
         index.data(),
@@ -64,10 +64,10 @@ int PortSDR::AirSpyHfStream::Initialize(const std::string_view index)
     const int ret = airspyhf_open_sn(&m_device, num);
     if (ret != AIRSPYHF_SUCCESS)
     {
-        return ret;
+        return ErrorCode::UNKNOWN;
     }
 
-    return 0;
+    return ErrorCode::OK;
 }
 
 PortSDR::DeviceInfo PortSDR::AirSpyHfStream::GetUSBStrings()
@@ -88,90 +88,102 @@ PortSDR::DeviceInfo PortSDR::AirSpyHfStream::GetUSBStrings()
     return device;
 }
 
-int PortSDR::AirSpyHfStream::Start()
+ErrorCode PortSDR::AirSpyHfStream::Start()
 {
     if (!m_device)
-        return -1;
+        return ErrorCode::INVALID_ARGUMENT;
 
-    return airspyhf_start(m_device, AirSpySDRCallback, this);
+    const int ret = airspyhf_start(m_device, AirSpySDRCallback, this);
+    if (ret != AIRSPYHF_SUCCESS)
+        return ErrorCode::UNKNOWN;
+    return ErrorCode::OK;
 }
 
-int PortSDR::AirSpyHfStream::Stop()
+ErrorCode PortSDR::AirSpyHfStream::Stop()
 {
     if (!m_device)
-        return -1;
+        return ErrorCode::INVALID_ARGUMENT;
 
-    return airspyhf_stop(m_device);
+    const int ret = airspyhf_stop(m_device);
+    if (ret != AIRSPYHF_SUCCESS)
+        return ErrorCode::UNKNOWN;
+    return ErrorCode::OK;
 }
 
-int PortSDR::AirSpyHfStream::SetCenterFrequency(uint32_t freq)
+ErrorCode PortSDR::AirSpyHfStream::SetCenterFrequency(uint32_t freq)
 {
     if (!m_device)
-        return -1;
+        return ErrorCode::INVALID_ARGUMENT;
 
     int ret = airspyhf_set_freq(m_device, freq);
-    if (ret == AIRSPYHF_SUCCESS)
+    if (ret != AIRSPYHF_SUCCESS)
     {
-        m_freq = freq;
+        return ErrorCode::UNKNOWN;
     }
 
-    return ret;
+    m_freq = freq;
+    return ErrorCode::OK;
 }
 
-int PortSDR::AirSpyHfStream::SetSampleRate(uint32_t sampleRate)
+ErrorCode PortSDR::AirSpyHfStream::SetSampleRate(uint32_t sampleRate)
 {
     if (!m_device)
-        return -1;
+        return ErrorCode::INVALID_ARGUMENT;
 
     int ret = airspyhf_set_samplerate(m_device, sampleRate);
-    if (ret == AIRSPYHF_SUCCESS)
+    if (ret != AIRSPYHF_SUCCESS)
     {
-        m_sampleRate = sampleRate;
+        return ErrorCode::UNKNOWN;
     }
 
-    return 0;
+    m_sampleRate = sampleRate;
+    return ErrorCode::OK;
 }
 
-int PortSDR::AirSpyHfStream::SetGain(double gain)
+ErrorCode PortSDR::AirSpyHfStream::SetGain(double gain)
 {
-    return -1; // AirSpy HF does not support gain control
+    return ErrorCode::INVALID_ARGUMENT; // AirSpy HF does not support gain control
 }
 
-int PortSDR::AirSpyHfStream::SetSampleFormat(SampleFormat format)
+ErrorCode PortSDR::AirSpyHfStream::SetSampleFormat(SampleFormat format)
 {
     if (!m_device)
-        return -1;
+        return ErrorCode::INVALID_ARGUMENT;
 
     if (format != getNativeSampleFormat())
-        return -1; // AirSpy HF does not support sample format changes
+        return ErrorCode::INVALID_ARGUMENT;
+    // AirSpy HF does not support sample format changes
 
-    return 0;
+    return ErrorCode::OK;
 }
 
-int PortSDR::AirSpyHfStream::SetGain(double gain, std::string_view name)
+ErrorCode PortSDR::AirSpyHfStream::SetGain(double gain, std::string_view name)
 {
     if (!m_device)
-        return -1;
+        return ErrorCode::INVALID_ARGUMENT;
 
     if (name == "ATT")
     {
         return SetAttenuation(gain);
     }
 
-    return 0;
+    return ErrorCode::INVALID_ARGUMENT;
 }
 
-int PortSDR::AirSpyHfStream::SetGainModes(std::string_view name)
+ErrorCode PortSDR::AirSpyHfStream::SetGainModes(std::string_view name)
 {
-    return 0;
+    return ErrorCode::INVALID_ARGUMENT;
 }
 
-int PortSDR::AirSpyHfStream::SetAttenuation(double attenuation)
+ErrorCode PortSDR::AirSpyHfStream::SetAttenuation(double attenuation)
 {
     if (!m_device)
-        return -1;
+        return ErrorCode::INVALID_ARGUMENT;
 
-    return airspyhf_set_hf_att(m_device, static_cast<int>(attenuation));
+    const int ret = airspyhf_set_hf_att(m_device, static_cast<int>(attenuation));
+    if (ret != AIRSPYHF_SUCCESS)
+        return ErrorCode::UNKNOWN;
+    return ErrorCode::OK;
 }
 
 std::vector<uint32_t> PortSDR::AirSpyHfStream::GetSampleRates() const

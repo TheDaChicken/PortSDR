@@ -8,6 +8,8 @@
 #include <cstdint>
 #include <string>
 
+#include "Error.h"
+
 namespace PortSDR
 {
     class Host;
@@ -16,9 +18,9 @@ namespace PortSDR
     struct Device
     {
         std::string serial;
-        const Host* host;
+        std::weak_ptr<const Host> host;
 
-        int CreateStream(std::unique_ptr<Stream>& stream) const;
+        ErrorCode CreateStream(std::unique_ptr<Stream>& stream) const;
     };
 
     struct DeviceInfo

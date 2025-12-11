@@ -13,7 +13,7 @@
 
 namespace PortSDR
 {
-    class Host
+    class Host : public std::enable_shared_from_this<Host>
     {
     public:
         enum HostType
@@ -48,8 +48,9 @@ namespace PortSDR
             }
         }
 
-        int CreateAndInitializeStream(std::string_view serial,
-                                      std::unique_ptr<Stream>& stream) const;
+        ErrorCode CreateAndInitializeStream(
+            std::string_view serial,
+            std::unique_ptr<Stream>& stream) const;
 
     private:
         HostType type_;

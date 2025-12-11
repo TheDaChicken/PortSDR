@@ -43,7 +43,7 @@ TEST(RTLSDR, Stream)
     const auto& device = devices.front();
     const auto stream = sdrHost->CreateStream();
 
-    ASSERT_EQ(stream->Initialize(device), 0) << "Failed to initialize stream";
+    ASSERT_EQ(stream->Initialize(device), ErrorCode::OK) << "Failed to initialize stream";
 
     // Test callback
     ASSERT_EQ(stream->SetCallback([](const PortSDR::SDRTransfer& sdr)
@@ -53,10 +53,11 @@ TEST(RTLSDR, Stream)
               0) << "Failed to set callback";
 
 
-    ASSERT_EQ(stream->SetSampleFormat(PortSDR::SAMPLE_FORMAT_IQ_UINT8), 0) << "Failed to set sample format";
-    ASSERT_EQ(stream->Start(), 0) << "Failed to start stream";
+    ASSERT_EQ(stream->SetSampleFormat(PortSDR::SAMPLE_FORMAT_IQ_UINT8), ErrorCode::OK)
+        << "Failed to set sample format";
+    ASSERT_EQ(stream->Start(), ErrorCode::OK) << "Failed to start stream";
 
     std::this_thread::sleep_for(std::chrono::seconds{1});
 
-    ASSERT_EQ(stream->Stop(), 0) << "Failed to stop stream";
+    ASSERT_EQ(stream->Stop(), ErrorCode::OK) << "Failed to stop stream";
 }

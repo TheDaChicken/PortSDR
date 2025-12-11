@@ -41,7 +41,7 @@ TEST(AirSpy, Stream)
     const auto& device = devices.front();
     auto stream = sdrHost->CreateStream();
 
-    ASSERT_EQ(stream->Initialize(device), 0) << "Failed to initialize stream";
+    ASSERT_EQ(stream->Initialize(device), ErrorCode::OK) << "Failed to initialize stream";
 
     // Test sample rates
     const auto sampleRates = stream->GetSampleRates();
@@ -54,20 +54,20 @@ TEST(AirSpy, Stream)
                   }),
               0) << "Failed to set callback";
 
-    ASSERT_EQ(stream->SetSampleRate(sampleRates.front()), 0) << "Failed to set sample rate";
-    ASSERT_EQ(stream->SetSampleFormat(PortSDR::SAMPLE_FORMAT_IQ_FLOAT32), 0) << "Failed to set sample format";
-    ASSERT_EQ(stream->Start(), 0) << "Failed to start stream";
+    ASSERT_EQ(stream->SetSampleRate(sampleRates.front()), ErrorCode::OK) << "Failed to set sample rate";
+    ASSERT_EQ(stream->SetSampleFormat(PortSDR::SAMPLE_FORMAT_IQ_FLOAT32), ErrorCode::OK) << "Failed to set sample format";
+    ASSERT_EQ(stream->Start(), ErrorCode::OK) << "Failed to start stream";
 
     // Test Gain
     const auto gainRange = stream->GetGainStage();
 
-    ASSERT_EQ(stream->SetGain(gainRange.range.Min()), 0) << "Failed to set gain";
-    ASSERT_EQ(stream->SetGain(gainRange.range.Max()), 0) << "Failed to set gain";
+    ASSERT_EQ(stream->SetGain(gainRange.range.Min()), ErrorCode::OK) << "Failed to set gain";
+    ASSERT_EQ(stream->SetGain(gainRange.range.Max()), ErrorCode::OK) << "Failed to set gain";
 
     // Test Frequency. Tune to some rando frequency.
-    ASSERT_EQ(stream->SetCenterFrequency(100.7e6), 0) << "Failed to set frequency";
+    ASSERT_EQ(stream->SetCenterFrequency(100.7e6), ErrorCode::OK) << "Failed to set frequency";
 
     std::this_thread::sleep_for(std::chrono::seconds{1});
 
-    ASSERT_EQ(stream->Stop(), 0) << "Failed to stop stream";
+    ASSERT_EQ(stream->Stop(), ErrorCode::OK) << "Failed to stop stream";
 }

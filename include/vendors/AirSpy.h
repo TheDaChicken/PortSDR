@@ -24,23 +24,23 @@ namespace PortSDR
     public:
         ~AirSpyStream() override;
 
-        int Initialize(std::string_view index) override;
+        ErrorCode Initialize(std::string_view index) override;
 
         DeviceInfo GetUSBStrings() override;
 
-        int Start() override;
-        int Stop() override;
-        int SetCenterFrequency(uint32_t freq) override;
-        int SetSampleRate(uint32_t sampleRate) override;
-        int SetGain(double gain) override;
-        int SetSampleFormat(SampleFormat format) override;
+        ErrorCode Start() override;
+        ErrorCode Stop() override;
+        ErrorCode SetCenterFrequency(uint32_t freq) override;
+        ErrorCode SetSampleRate(uint32_t sampleRate) override;
+        ErrorCode SetGain(double gain) override;
+        ErrorCode SetSampleFormat(SampleFormat format) override;
 
-        int SetGain(double gain, std::string_view name) override;
-        int SetGainModes(std::string_view name) override;
+        ErrorCode SetGain(double gain, std::string_view name) override;
+        ErrorCode SetGainModes(std::string_view name) override;
 
-        int SetLnaGain(double gain);
-        int SetMixGain(double gain);
-        int SetIfGain(double gain);
+        ErrorCode SetLnaGain(double gain);
+        ErrorCode SetMixGain(double gain);
+        ErrorCode SetIfGain(double gain);
 
         [[nodiscard]] std::vector<uint32_t> GetSampleRates() const override;
         [[nodiscard]] std::vector<SampleFormat> GetSampleFormats() const override;

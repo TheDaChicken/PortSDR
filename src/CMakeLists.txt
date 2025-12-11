@@ -30,6 +30,7 @@ add_library(${PortSDR_LIBRARY_NAME}
         vendors/RTLSDR.cpp
         IQConverter.cpp
         ${PortSDR_VENDOR_FILES}
+        ../include/Error.h
 )
 
 target_include_directories(${PortSDR_LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)

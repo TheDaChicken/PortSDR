@@ -18,7 +18,7 @@ namespace PortSDR
 
         PortSDR();
 
-        std::optional<Device> GetFirstAvailableSDR();
+        std::optional<Device> GetFirstAvailableSDR() const;
 
         std::vector<std::shared_ptr<Host>> GetHosts();
         std::vector<Device> GetDevices();

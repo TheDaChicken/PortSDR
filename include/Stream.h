@@ -40,14 +40,14 @@ namespace PortSDR
          * @param serial serial of the device.
          * @return status code.
          */
-        virtual int Initialize(std::string_view serial) = 0;
+        virtual ErrorCode Initialize(std::string_view serial) = 0;
 
         /**
          * Opens device
          * @param device device container
          * @return status code.
          */
-        int Initialize(const Device& device)
+        ErrorCode Initialize(const Device& device)
         {
             return Initialize(device.serial);
         };
@@ -63,27 +63,27 @@ namespace PortSDR
          * This creates an underlying thread.
          * @return ret code
          */
-        virtual int Start() = 0;
-        virtual int Stop() = 0;
+        virtual ErrorCode Start() = 0;
+        virtual ErrorCode Stop() = 0;
 
         /**
          * Sets sample rate of the given SDR hardware
          * @param sampleRate new sample rate
          * @return ret code
          */
-        virtual int SetSampleRate(uint32_t sampleRate) = 0;
+        virtual ErrorCode SetSampleRate(uint32_t sampleRate) = 0;
 
         /**
          * Sets current center frequency for given hardware
          * @param freq in Hz
          * @return ret code
          */
-        virtual int SetCenterFrequency(uint32_t freq) = 0;
-        virtual int SetSampleFormat(SampleFormat format) = 0;
+        virtual ErrorCode SetCenterFrequency(uint32_t freq) = 0;
+        virtual ErrorCode SetSampleFormat(SampleFormat format) = 0;
 
-        virtual int SetGain(double gain) = 0;
-        virtual int SetGain(double gain, std::string_view name) = 0;
-        virtual int SetGainModes(std::string_view name) = 0;
+        virtual ErrorCode SetGain(double gain) = 0;
+        virtual ErrorCode SetGain(double gain, std::string_view name) = 0;
+        virtual ErrorCode SetGainModes(std::string_view name) = 0;
 
         /**
          * Gets all sample rates supported by given SDR hardware.

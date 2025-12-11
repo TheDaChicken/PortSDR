@@ -67,8 +67,8 @@ int main()
     // Open the stream from the device
     std::unique_ptr<PortSDR::Stream> stream;
     
-    int ret = device->CreateStream(stream);
-    if (ret != 0)
+    auto ret = device->CreateStream(stream);
+    if (ret != ErrorCode::OK)
     {
         std::cerr << "Failed to open the device" << std::endl;
         return 1;
@@ -109,8 +109,8 @@ int main()
     // Open the device
     std::unique_ptr<PortSDR::Stream> stream;
     
-    int ret = device->CreateStream(stream);
-    if (ret != 0)
+    auto ret = device->CreateStream(stream);
+    if (ret != ErrorCode::OK)
     {
         std::cerr << "Failed to open the device" << std::endl;
         return 1;

@@ -3,11 +3,31 @@
 //
 
 #include "vendors/AirSpy.h"
+
+#include <cassert>
+
 #include "libairspy/airspy.h"
 
 #include <Utils.h>
 
 #define AIRSPY_MAX_DEVICE 32
+
+static ErrorCode ConvertRetToErrorCode(const int airspy)
+{
+    switch (airspy)
+    {
+    case AIRSPY_SUCCESS:
+        return ErrorCode::OK;
+    case AIRSPY_ERROR_INVALID_PARAM:
+        return ErrorCode::INVALID_ARGUMENT;
+    case AIRSPY_ERROR_NOT_FOUND:
+        return ErrorCode::DEVICE_NOT_FOUND;
+    case AIRSPY_ERROR_LIBUSB:
+        return ErrorCode::LIBUSB_ERROR;
+    default:
+        return ErrorCode::UNKNOWN;
+    }
+}
 
 PortSDR::AirSpyHost::AirSpyHost() : Host(AIRSPY)
 {
@@ -30,7 +50,7 @@ std::vector<PortSDR::Device> PortSDR::AirSpyHost::AvailableDevices() const
 
         device.serial = string_format("%016llX",
                                       serials[i]);
-        device.host = this;
+        device.host = shared_from_this();
     }
     return devices;
 }
@@ -46,13 +66,13 @@ PortSDR::AirSpyStream::~AirSpyStream()
         airspy_close(m_device);
 }
 
-int PortSDR::AirSpyStream::Initialize(const std::string_view index)
+ErrorCode PortSDR::AirSpyStream::Initialize(const std::string_view index)
 {
     if (m_device)
-        return 0;
+        return ErrorCode::OK;
 
     if (index.size() != 16)
-        return -1;
+        return ErrorCode::INVALID_ARGUMENT;
 
     const uint64_t num = strtoull(
         index.data(),
@@ -61,15 +81,13 @@ int PortSDR::AirSpyStream::Initialize(const std::string_view index)
 
     int ret = airspy_open_sn(&m_device, num);
     if (ret != AIRSPY_SUCCESS)
-        return ret;
+        return ConvertRetToErrorCode(ret);
 
-    ret = SetSampleFormat(SAMPLE_FORMAT_IQ_INT16);
-    if (ret != AIRSPY_SUCCESS)
-    {
-        return ret;
-    }
+    ErrorCode code = SetSampleFormat(SAMPLE_FORMAT_IQ_INT16);
+    if (code != ErrorCode::OK)
+        return code;
 
-    return 0;
+    return ErrorCode::OK;
 }
 
 PortSDR::DeviceInfo PortSDR::AirSpyStream::GetUSBStrings()
@@ -97,42 +115,42 @@ PortSDR::DeviceInfo PortSDR::AirSpyStream::GetUSBStrings()
     return device;
 }
 
-int PortSDR::AirSpyStream::Start()
+ErrorCode PortSDR::AirSpyStream::Start()
 {
     if (!m_device)
-        return -1;
+        return ErrorCode::INVALID_ARGUMENT;
 
-    return airspy_start_rx(m_device, AirSpySDRCallback, this);
+    return ConvertRetToErrorCode(airspy_start_rx(m_device, AirSpySDRCallback, this));
 }
 
-int PortSDR::AirSpyStream::Stop()
+ErrorCode PortSDR::AirSpyStream::Stop()
 {
     if (!m_device)
-        return -1;
+        return ErrorCode::INVALID_ARGUMENT;
 
     if (airspy_is_streaming(m_device) != AIRSPY_TRUE)
-        return -2;
+        return ErrorCode::INVALID_ARGUMENT;
 
-    return airspy_stop_rx(m_device);
+    return ConvertRetToErrorCode(airspy_stop_rx(m_device));
 }
 
-int PortSDR::AirSpyStream::SetCenterFrequency(uint32_t freq)
+ErrorCode PortSDR::AirSpyStream::SetCenterFrequency(uint32_t freq)
 {
     if (!m_device)
-        return -1;
+        return ErrorCode::INVALID_ARGUMENT;
 
     int ret = airspy_set_freq(m_device, freq);
     if (ret == AIRSPY_SUCCESS)
     {
         m_freq = freq;
     }
-    return ret;
+    return ConvertRetToErrorCode(ret);
 }
 
-int PortSDR::AirSpyStream::SetSampleRate(uint32_t sampleRate)
+ErrorCode PortSDR::AirSpyStream::SetSampleRate(uint32_t sampleRate)
 {
     if (!m_device)
-        return -1;
+        return ErrorCode::INVALID_ARGUMENT;
 
     int ret = airspy_set_samplerate(m_device, sampleRate);
     if (ret == AIRSPY_SUCCESS)
@@ -140,89 +158,94 @@ int PortSDR::AirSpyStream::SetSampleRate(uint32_t sampleRate)
         m_sampleRate = sampleRate;
     }
 
-    return ret;
+    return ConvertRetToErrorCode(ret);
 }
 
-int PortSDR::AirSpyStream::SetGain(double gain)
+ErrorCode PortSDR::AirSpyStream::SetGain(const double gain)
 {
     if (!m_device)
-        return -1;
+        return ErrorCode::INVALID_ARGUMENT;
+
+    const int uint_gain = static_cast<uint8_t>(gain);
 
     int ret = AIRSPY_ERROR_INVALID_PARAM;
     if (m_gainMode == LINEARITY)
     {
-        ret = airspy_set_linearity_gain(m_device, static_cast<uint8_t>(gain));
+        ret = airspy_set_linearity_gain(m_device, uint_gain);
     }
     else if (m_gainMode == SENSITIVITY)
     {
-        ret = airspy_set_sensitivity_gain(m_device, static_cast<uint8_t>(gain));
+        ret = airspy_set_sensitivity_gain(m_device, uint_gain);
     }
 
     if (ret == AIRSPY_SUCCESS)
     {
-        m_gain = gain;
+        m_gain = uint_gain;
     }
-    return ret;
+    return ErrorCode::OK;
 }
 
-int PortSDR::AirSpyStream::SetSampleFormat(SampleFormat format)
+ErrorCode PortSDR::AirSpyStream::SetSampleFormat(SampleFormat format)
 {
     if (!m_device)
-        return -1;
+        return ErrorCode::UNINITIALIZED;
 
     const airspy_sample_type sampleType = ConvertToSampleType(format);
     if (sampleType == AIRSPY_SAMPLE_END)
-        return -1; // Invalid sample format
+        return ErrorCode::INVALID_ARGUMENT; // Invalid sample format
 
     const int ret = airspy_set_sample_type(m_device, sampleType);
     if (ret != AIRSPY_SUCCESS)
-        return ret;
+        return ConvertRetToErrorCode(ret);
 
     m_sampleType = format;
-    return 0;
+    return ErrorCode::OK;
 }
 
-int PortSDR::AirSpyStream::SetLnaGain(double gain)
+ErrorCode PortSDR::AirSpyStream::SetLnaGain(double gain)
 {
     if (!m_device)
-        return -1;
+        return ErrorCode::INVALID_ARGUMENT;
 
     int ret = airspy_set_lna_gain(m_device, static_cast<uint8_t>(gain));
     if (ret == AIRSPY_SUCCESS)
     {
         m_lnaGain = static_cast<uint8_t>(gain);
     }
-    return ret;
+    return ConvertRetToErrorCode(ret);
 }
 
-int PortSDR::AirSpyStream::SetMixGain(double gain)
+ErrorCode PortSDR::AirSpyStream::SetMixGain(double gain)
 {
     if (!m_device)
-        return -1;
+        return ErrorCode::INVALID_ARGUMENT;
 
     int ret = airspy_set_mixer_gain(m_device, static_cast<uint8_t>(gain));
     if (ret == AIRSPY_SUCCESS)
     {
         m_mixGain = static_cast<uint8_t>(gain);
     }
-    return ret;
+    return ConvertRetToErrorCode(ret);
 }
 
-int PortSDR::AirSpyStream::SetIfGain(double gain)
+ErrorCode PortSDR::AirSpyStream::SetIfGain(double gain)
 {
     if (!m_device)
-        return -1;
+        return ErrorCode::INVALID_ARGUMENT;
 
     int ret = airspy_set_vga_gain(m_device, static_cast<uint8_t>(gain));
     if (ret == AIRSPY_SUCCESS)
     {
         m_ifGain = static_cast<uint8_t>(gain);
     }
-    return ret;
+    return ConvertRetToErrorCode(ret);
 }
 
-int PortSDR::AirSpyStream::SetGain(double gain, std::string_view name)
+ErrorCode PortSDR::AirSpyStream::SetGain(double gain, std::string_view name)
 {
+    if (!m_device)
+        return ErrorCode::UNINITIALIZED;
+
     if ("LNA" == name)
     {
         return SetLnaGain(gain);
@@ -235,22 +258,22 @@ int PortSDR::AirSpyStream::SetGain(double gain, std::string_view name)
     {
         return SetIfGain(gain);
     }
-    return -1;
+    return ErrorCode::INVALID_ARGUMENT;
 }
 
-int PortSDR::AirSpyStream::SetGainModes(std::string_view name)
+ErrorCode PortSDR::AirSpyStream::SetGainModes(std::string_view name)
 {
     if ("LINEARITY" == name)
     {
         m_gainMode = LINEARITY;
-        return 0;
+        return ErrorCode::OK;
     }
     if ("SENSITIVITY" == name)
     {
         m_gainMode = SENSITIVITY;
-        return 0;
+        return ErrorCode::OK;
     }
-    return -1;
+    return ErrorCode::INVALID_ARGUMENT;
 }
 
 std::vector<uint32_t> PortSDR::AirSpyStream::GetSampleRates() const

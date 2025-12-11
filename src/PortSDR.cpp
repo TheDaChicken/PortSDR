@@ -4,6 +4,8 @@
 #include <algorithm>
 #include <iostream>
 
+#include "Error.h"
+
 #ifdef RTLSDR_SUPPORT
 #include "vendors/RTLSDR.h"
 #endif
@@ -44,11 +46,12 @@ std::vector<std::shared_ptr<PortSDR::Host>> PortSDR::PortSDR::GetHosts()
 
 std::shared_ptr<PortSDR::Host> PortSDR::PortSDR::GetHost(Host::HostType name)
 {
-    const auto iter = std::find_if(m_hosts.begin(), m_hosts.end(),
-                                   [name](const std::shared_ptr<Host>& key)
-                                   {
-                                       return key->GetType() == name;
-                                   });
+    const auto iter =
+        std::find_if(m_hosts.begin(), m_hosts.end(),
+                     [name](const std::shared_ptr<Host>& key)
+                     {
+                         return key->GetType() == name;
+                     });
 
     if (iter != m_hosts.end())
     {
@@ -58,7 +61,7 @@ std::shared_ptr<PortSDR::Host> PortSDR::PortSDR::GetHost(Host::HostType name)
     return {};
 }
 
-std::optional<PortSDR::Device> PortSDR::PortSDR::GetFirstAvailableSDR()
+std::optional<PortSDR::Device> PortSDR::PortSDR::GetFirstAvailableSDR() const
 {
     for (const auto& host : m_hosts)
     {
@@ -85,21 +88,23 @@ std::vector<PortSDR::Device> PortSDR::PortSDR::GetDevices()
     return total_devices;
 }
 
-int PortSDR::Device::CreateStream(std::unique_ptr<Stream>& stream) const
+ErrorCode PortSDR::Device::CreateStream(std::unique_ptr<Stream>& stream) const
 {
-    if (!host)
-        return {};
+    const auto h = host.lock();
+    if (!h)
+        return ErrorCode::HOST_UNAVAILABLE;
 
-    return host->CreateAndInitializeStream(serial, stream);
+    return h->CreateAndInitializeStream(serial, stream);
 }
 
-int PortSDR::Host::CreateAndInitializeStream(const std::string_view serial,
-                                             std::unique_ptr<Stream>& stream) const
+ErrorCode PortSDR::Host::CreateAndInitializeStream(
+    const std::string_view serial,
+    std::unique_ptr<Stream>& stream) const
 {
     auto new_stream = CreateStream();
-    const int ret = new_stream->Initialize(serial);
+    const ErrorCode ret = new_stream->Initialize(serial);
 
-    if (ret < 0)
+    if (ret < ErrorCode::OK)
     {
         return ret;
     }

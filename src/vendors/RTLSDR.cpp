@@ -45,7 +45,7 @@ std::vector<PortSDR::Device> PortSDR::RTLHost::AvailableDevices() const
         auto& device = devices[dev_id++];
 
         device.serial = serial;
-        device.host = this;
+        device.host = shared_from_this();
     }
 
     devices.resize(dev_id);
@@ -90,82 +90,100 @@ PortSDR::RTLStream::~RTLStream()
     m_dev = nullptr;
 }
 
-int PortSDR::RTLStream::Initialize(const std::string_view serial)
+ErrorCode PortSDR::RTLStream::Initialize(const std::string_view serial)
 {
     int ret = 0;
 
     if (m_dev)
-        return ret;
+        return ErrorCode::INVALID_ARGUMENT;
 
     const int index = rtlsdr_get_index_by_serial(serial.data());
     if (index < 0)
-        return ret;
+    {
+        if (index == -2 || index == -1)
+            return ErrorCode::DEVICE_NOT_FOUND;
+
+        return ErrorCode::UNKNOWN;
+    }
 
     ret = rtlsdr_open(&m_dev, index);
     if (ret < 0)
-        return ret;
+        return ErrorCode::UNKNOWN;
 
     ret = rtlsdr_set_offset_tuning(m_dev, 1);
     if (ret != 0 && ret != -2)
-        return ret;
+        return ErrorCode::UNKNOWN;
 
     ret = rtlsdr_reset_buffer(m_dev);
     if (ret < 0)
-        return ret;
+        return ErrorCode::UNKNOWN;
 
-    return 0;
+    return ErrorCode::OK;
 }
 
-int PortSDR::RTLStream::Start()
+ErrorCode PortSDR::RTLStream::Start()
 {
     if (!m_dev)
-        return -1;
+        return ErrorCode::INVALID_ARGUMENT;
 
     if (m_thread.joinable())
-        return 0;
+        return ErrorCode::OK;
 
     m_thread = std::thread(&RTLStream::Process, this);
-    return 0;
+    return ErrorCode::OK;
 }
 
-int PortSDR::RTLStream::Stop()
+ErrorCode PortSDR::RTLStream::Stop()
 {
-    if (m_dev && m_thread.joinable())
+    if (!m_dev && !m_thread.joinable())
+        return ErrorCode::INVALID_ARGUMENT;
+
+    rtlsdr_cancel_async(m_dev);
+    m_thread.join();
+    return ErrorCode::OK;
+}
+
+ErrorCode PortSDR::RTLStream::SetCenterFrequency(const uint32_t freq)
+{
+    if (!m_dev)
+        return ErrorCode::INVALID_ARGUMENT;
+
+    int ret = rtlsdr_set_center_freq(m_dev, freq);
+    if (ret < 0)
+        return ErrorCode::UNKNOWN;
+    return ErrorCode::OK;
+}
+
+ErrorCode PortSDR::RTLStream::SetSampleRate(const uint32_t freq)
+{
+    if (!m_dev)
+        return ErrorCode::INVALID_ARGUMENT;
+
+    int ret = rtlsdr_set_sample_rate(m_dev, freq);
+    if (ret < 0)
     {
-        rtlsdr_cancel_async(m_dev);
-        m_thread.join();
+        if (ret == -EINVAL)
+            return ErrorCode::INVALID_ARGUMENT;
+        return ErrorCode::UNKNOWN;
     }
-    return 0;
+    return ErrorCode::OK;
 }
 
-int PortSDR::RTLStream::SetCenterFrequency(uint32_t freq)
+ErrorCode PortSDR::RTLStream::SetSampleFormat(const SampleFormat type)
 {
-    return rtlsdr_set_center_freq(m_dev, freq);
+    if (type != SAMPLE_FORMAT_IQ_UINT8)
+        return ErrorCode::INVALID_ARGUMENT;
+    return ErrorCode::OK;
 }
 
-int PortSDR::RTLStream::SetSampleRate(uint32_t freq)
-{
-    if (!m_dev)
-        return -1;
-
-    return rtlsdr_set_sample_rate(m_dev, freq);
-}
-
-int PortSDR::RTLStream::SetSampleFormat(SampleFormat type)
-{
-    if (type == SAMPLE_FORMAT_IQ_UINT8)
-        return 0;
-    return -1;
-}
-
-int PortSDR::RTLStream::SetIfGain(double gain)
+ErrorCode PortSDR::RTLStream::SetIfGain(const double gain)
 {
     if (!m_dev)
-        return 0;
+        return ErrorCode::INVALID_ARGUMENT;
 
     if (rtlsdr_get_tuner_type(m_dev) != RTLSDR_TUNER_E4000)
     {
-        return 0;
+        return ErrorCode::OK;
     }
 
     std::vector<MetaRange> if_gains;
@@ -215,14 +233,16 @@ int PortSDR::RTLStream::SetIfGain(double gain)
 
     for (int stage = 1; stage <= gains.size(); stage++)
     {
-        int ret = rtlsdr_set_tuner_if_gain(m_dev, stage, static_cast<int>(gains[stage] * 10.0));
+        const int ret = rtlsdr_set_tuner_if_gain(
+            m_dev, stage,
+            static_cast<int>(gains[stage] * 10.0));
         if (ret < 0)
-            return ret;
+            return ErrorCode::UNKNOWN;
     }
-    return 0;
+    return ErrorCode::OK;
 }
 
-int PortSDR::RTLStream::SetGain(double gain, std::string_view name)
+ErrorCode PortSDR::RTLStream::SetGain(double gain, std::string_view name)
 {
     if ("IF" == name)
     {
@@ -232,20 +252,23 @@ int PortSDR::RTLStream::SetGain(double gain, std::string_view name)
     {
         return SetGain(gain);
     }
-    return -1;
+    return ErrorCode::INVALID_ARGUMENT;
 }
 
-int PortSDR::RTLStream::SetGain(double gain)
+ErrorCode PortSDR::RTLStream::SetGain(double gain)
 {
     if (!m_dev)
-        return 0;
+        return ErrorCode::INVALID_ARGUMENT;
 
-    return rtlsdr_set_tuner_gain(m_dev, gain * 10.0);
+    const int ret = rtlsdr_set_tuner_gain(m_dev, gain * 10.0);
+    if (ret < 0)
+        return ErrorCode::UNKNOWN;
+    return ErrorCode::OK;
 }
 
-int PortSDR::RTLStream::SetGainModes(std::string_view mode)
+ErrorCode PortSDR::RTLStream::SetGainModes(std::string_view mode)
 {
-    return -1;
+    return ErrorCode::INVALID_ARGUMENT;
 }
 
 uint32_t PortSDR::RTLStream::GetCenterFrequency() const
@@ -259,7 +282,7 @@ uint32_t PortSDR::RTLStream::GetCenterFrequency() const
 uint32_t PortSDR::RTLStream::GetSampleRate() const
 {
     if (!m_dev)
-        return -1;
+        return 0;
 
     return rtlsdr_get_sample_rate(m_dev);
 }
