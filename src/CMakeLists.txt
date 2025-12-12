@@ -1,5 +1,14 @@
 set(PortSDR_LIBRARY_NAME "PortSDR")
 
+set(PortSDR_PUBLIC_HEADER
+    ../include/PortSDR.h
+    ../include/Ranges.h
+    ../include/Device.h
+    ../include/Stream.h
+    ../include/Host.h
+    ../include/Error.h
+)
+
 if (RTLSDR_FOUND)
     list(APPEND PortSDR_VENDOR_FILES
             ../include/vendors/RTLSDR.h
@@ -27,17 +36,15 @@ endif()
 add_library(${PortSDR_LIBRARY_NAME}
         ${LIBRARY_BUILD_TYPE}
         PortSDR.cpp
-        vendors/RTLSDR.cpp
         IQConverter.cpp
         ${PortSDR_VENDOR_FILES}
-        ../include/Error.h
+        ${PortSDR_PUBLIC_HEADER}
 )
 
 target_include_directories(${PortSDR_LIBRARY_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../include)
-target_include_directories(${PortSDR_LIBRARY_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_include_directories(${PortSDR_LIBRARY_NAME} PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/../)
 
-set_target_properties(${PortSDR_LIBRARY_NAME} PROPERTIES PUBLIC_HEADER ${PortSDR_PUBLIC_HEADER})
+set_target_properties(${PortSDR_LIBRARY_NAME} PROPERTIES PUBLIC_HEADER "${PortSDR_PUBLIC_HEADER}")
 set_target_properties(${PortSDR_LIBRARY_NAME} PROPERTIES VERSION ${PortSDR_VERSION_MAJOR}.${PortSDR_VERSION_MINOR})
 set_target_properties(${PortSDR_LIBRARY_NAME} PROPERTIES SOVERSION ${PortSDR_VERSION_MAJOR})
 set_target_properties(${PortSDR_LIBRARY_NAME} PROPERTIES OUTPUT_NAME ${PortSDR_LIBRARY_NAME})

@@ -1,8 +1,8 @@
-if (NOT RTLSDR_FOUND)
-    find_package(RTLSDR)
+if (NOT rtlsdr_FOUND)
+    find_package(rtlsdr)
 endif()
 
-if (RTLSDR_FOUND)
+if (rtlsdr_FOUND)
     message(STATUS "RTL-SDR library found")
 else ()
     message(FATAL_ERROR "RTL-SDR library not found")
