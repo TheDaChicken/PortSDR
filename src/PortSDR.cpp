@@ -88,7 +88,7 @@ std::vector<PortSDR::Device> PortSDR::PortSDR::GetDevices()
     return total_devices;
 }
 
-ErrorCode PortSDR::Device::CreateStream(std::unique_ptr<Stream>& stream) const
+PortSDR::ErrorCode PortSDR::Device::CreateStream(std::unique_ptr<Stream>& stream) const
 {
     const auto h = host.lock();
     if (!h)
@@ -97,7 +97,7 @@ ErrorCode PortSDR::Device::CreateStream(std::unique_ptr<Stream>& stream) const
     return h->CreateAndInitializeStream(serial, stream);
 }
 
-ErrorCode PortSDR::Host::CreateAndInitializeStream(
+PortSDR::ErrorCode PortSDR::Host::CreateAndInitializeStream(
     const std::string_view serial,
     std::unique_ptr<Stream>& stream) const
 {
