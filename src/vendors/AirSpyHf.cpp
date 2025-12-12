@@ -4,7 +4,7 @@
 
 #include "vendors/AirSpyHf.h"
 
-#include "Utils.h"
+#include "../Utils.h"
 
 PortSDR::AirSpyHfHost::AirSpyHfHost() : Host(AIRSPY_HF)
 {
@@ -49,7 +49,7 @@ PortSDR::AirSpyHfStream::~AirSpyHfStream()
     }
 }
 
-ErrorCode PortSDR::AirSpyHfStream::Initialize(const std::string_view index)
+PortSDR::ErrorCode PortSDR::AirSpyHfStream::Initialize(const std::string_view index)
 {
     if (m_device)
         return ErrorCode::INVALID_ARGUMENT;
@@ -88,7 +88,7 @@ PortSDR::DeviceInfo PortSDR::AirSpyHfStream::GetUSBStrings()
     return device;
 }
 
-ErrorCode PortSDR::AirSpyHfStream::Start()
+PortSDR::ErrorCode PortSDR::AirSpyHfStream::Start()
 {
     if (!m_device)
         return ErrorCode::INVALID_ARGUMENT;
@@ -99,7 +99,7 @@ ErrorCode PortSDR::AirSpyHfStream::Start()
     return ErrorCode::OK;
 }
 
-ErrorCode PortSDR::AirSpyHfStream::Stop()
+PortSDR::ErrorCode PortSDR::AirSpyHfStream::Stop()
 {
     if (!m_device)
         return ErrorCode::INVALID_ARGUMENT;
@@ -110,7 +110,7 @@ ErrorCode PortSDR::AirSpyHfStream::Stop()
     return ErrorCode::OK;
 }
 
-ErrorCode PortSDR::AirSpyHfStream::SetCenterFrequency(uint32_t freq)
+PortSDR::ErrorCode PortSDR::AirSpyHfStream::SetCenterFrequency(uint32_t freq)
 {
     if (!m_device)
         return ErrorCode::INVALID_ARGUMENT;
@@ -121,11 +121,11 @@ ErrorCode PortSDR::AirSpyHfStream::SetCenterFrequency(uint32_t freq)
         return ErrorCode::UNKNOWN;
     }
 
-    m_freq = freq;
+            m_freq = freq;
     return ErrorCode::OK;
 }
 
-ErrorCode PortSDR::AirSpyHfStream::SetSampleRate(uint32_t sampleRate)
+PortSDR::ErrorCode PortSDR::AirSpyHfStream::SetSampleRate(uint32_t sampleRate)
 {
     if (!m_device)
         return ErrorCode::INVALID_ARGUMENT;
@@ -140,12 +140,12 @@ ErrorCode PortSDR::AirSpyHfStream::SetSampleRate(uint32_t sampleRate)
     return ErrorCode::OK;
 }
 
-ErrorCode PortSDR::AirSpyHfStream::SetGain(double gain)
+PortSDR::ErrorCode PortSDR::AirSpyHfStream::SetGain(double gain)
 {
     return ErrorCode::INVALID_ARGUMENT; // AirSpy HF does not support gain control
 }
 
-ErrorCode PortSDR::AirSpyHfStream::SetSampleFormat(SampleFormat format)
+PortSDR::ErrorCode PortSDR::AirSpyHfStream::SetSampleFormat(SampleFormat format)
 {
     if (!m_device)
         return ErrorCode::INVALID_ARGUMENT;
@@ -157,7 +157,7 @@ ErrorCode PortSDR::AirSpyHfStream::SetSampleFormat(SampleFormat format)
     return ErrorCode::OK;
 }
 
-ErrorCode PortSDR::AirSpyHfStream::SetGain(double gain, std::string_view name)
+PortSDR::ErrorCode PortSDR::AirSpyHfStream::SetGain(double gain, std::string_view name)
 {
     if (!m_device)
         return ErrorCode::INVALID_ARGUMENT;
@@ -170,12 +170,12 @@ ErrorCode PortSDR::AirSpyHfStream::SetGain(double gain, std::string_view name)
     return ErrorCode::INVALID_ARGUMENT;
 }
 
-ErrorCode PortSDR::AirSpyHfStream::SetGainModes(std::string_view name)
+PortSDR::ErrorCode PortSDR::AirSpyHfStream::SetGainModes(std::string_view name)
 {
     return ErrorCode::INVALID_ARGUMENT;
 }
 
-ErrorCode PortSDR::AirSpyHfStream::SetAttenuation(double attenuation)
+PortSDR::ErrorCode PortSDR::AirSpyHfStream::SetAttenuation(double attenuation)
 {
     if (!m_device)
         return ErrorCode::INVALID_ARGUMENT;

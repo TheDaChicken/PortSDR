@@ -37,6 +37,7 @@ add_library(${PortSDR_LIBRARY_NAME}
         ${LIBRARY_BUILD_TYPE}
         PortSDR.cpp
         IQConverter.cpp
+        Utils.h
         ${PortSDR_VENDOR_FILES}
         ${PortSDR_PUBLIC_HEADER}
 )

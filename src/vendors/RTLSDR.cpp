@@ -11,7 +11,7 @@
 #include <numeric>
 #include <thread>
 
-#include <Utils.h>
+#include "../Utils.h"
 
 #include "Ranges.h"
 
@@ -90,7 +90,7 @@ PortSDR::RTLStream::~RTLStream()
     m_dev = nullptr;
 }
 
-ErrorCode PortSDR::RTLStream::Initialize(const std::string_view serial)
+PortSDR::ErrorCode PortSDR::RTLStream::Initialize(const std::string_view serial)
 {
     int ret = 0;
 
@@ -121,7 +121,7 @@ ErrorCode PortSDR::RTLStream::Initialize(const std::string_view serial)
     return ErrorCode::OK;
 }
 
-ErrorCode PortSDR::RTLStream::Start()
+PortSDR::ErrorCode PortSDR::RTLStream::Start()
 {
     if (!m_dev)
         return ErrorCode::INVALID_ARGUMENT;
@@ -133,7 +133,7 @@ ErrorCode PortSDR::RTLStream::Start()
     return ErrorCode::OK;
 }
 
-ErrorCode PortSDR::RTLStream::Stop()
+PortSDR::ErrorCode PortSDR::RTLStream::Stop()
 {
     if (!m_dev && !m_thread.joinable())
         return ErrorCode::INVALID_ARGUMENT;
@@ -143,7 +143,7 @@ ErrorCode PortSDR::RTLStream::Stop()
     return ErrorCode::OK;
 }
 
-ErrorCode PortSDR::RTLStream::SetCenterFrequency(const uint32_t freq)
+PortSDR::ErrorCode PortSDR::RTLStream::SetCenterFrequency(const uint32_t freq)
 {
     if (!m_dev)
         return ErrorCode::INVALID_ARGUMENT;
@@ -154,7 +154,7 @@ ErrorCode PortSDR::RTLStream::SetCenterFrequency(const uint32_t freq)
     return ErrorCode::OK;
 }
 
-ErrorCode PortSDR::RTLStream::SetSampleRate(const uint32_t freq)
+PortSDR::ErrorCode PortSDR::RTLStream::SetSampleRate(const uint32_t freq)
 {
     if (!m_dev)
         return ErrorCode::INVALID_ARGUMENT;
@@ -169,14 +169,14 @@ ErrorCode PortSDR::RTLStream::SetSampleRate(const uint32_t freq)
     return ErrorCode::OK;
 }
 
-ErrorCode PortSDR::RTLStream::SetSampleFormat(const SampleFormat type)
+PortSDR::ErrorCode PortSDR::RTLStream::SetSampleFormat(const SampleFormat type)
 {
     if (type != SAMPLE_FORMAT_IQ_UINT8)
         return ErrorCode::INVALID_ARGUMENT;
     return ErrorCode::OK;
 }
 
-ErrorCode PortSDR::RTLStream::SetIfGain(const double gain)
+PortSDR::ErrorCode PortSDR::RTLStream::SetIfGain(const double gain)
 {
     if (!m_dev)
         return ErrorCode::INVALID_ARGUMENT;
@@ -242,7 +242,7 @@ ErrorCode PortSDR::RTLStream::SetIfGain(const double gain)
     return ErrorCode::OK;
 }
 
-ErrorCode PortSDR::RTLStream::SetGain(double gain, std::string_view name)
+PortSDR::ErrorCode PortSDR::RTLStream::SetGain(double gain, std::string_view name)
 {
     if ("IF" == name)
     {
@@ -255,7 +255,7 @@ ErrorCode PortSDR::RTLStream::SetGain(double gain, std::string_view name)
     return ErrorCode::INVALID_ARGUMENT;
 }
 
-ErrorCode PortSDR::RTLStream::SetGain(double gain)
+PortSDR::ErrorCode PortSDR::RTLStream::SetGain(double gain)
 {
     if (!m_dev)
         return ErrorCode::INVALID_ARGUMENT;
@@ -266,7 +266,7 @@ ErrorCode PortSDR::RTLStream::SetGain(double gain)
     return ErrorCode::OK;
 }
 
-ErrorCode PortSDR::RTLStream::SetGainModes(std::string_view mode)
+PortSDR::ErrorCode PortSDR::RTLStream::SetGainModes(std::string_view mode)
 {
     return ErrorCode::INVALID_ARGUMENT;
 }
@@ -282,6 +282,10 @@ uint32_t PortSDR::RTLStream::GetCenterFrequency() const
 uint32_t PortSDR::RTLStream::GetSampleRate() const
 {
     if (!m_dev)
+        return 0;
+
+    const uint32_t ret = rtlsdr_get_sample_rate(m_dev);
+    if (ret <= 0)
         return 0;
 
     return rtlsdr_get_sample_rate(m_dev);
