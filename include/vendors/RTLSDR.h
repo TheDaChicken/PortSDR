@@ -37,8 +37,8 @@ namespace PortSDR
         ErrorCode SetSampleFormat(SampleFormat type) override;
 
         ErrorCode SetGain(double gain, std::string_view name) override;
-        ErrorCode SetGain(double gain) override;
-        ErrorCode SetGainModes(std::string_view mode) override;
+        ErrorCode SetRegularGain(double gain) const;
+        ErrorCode SetGainMode(GainMode mode) override;
 
         ErrorCode SetIfGain(double gain);
 
@@ -48,12 +48,12 @@ namespace PortSDR
 
         [[nodiscard]] uint32_t GetCenterFrequency() const override;
         [[nodiscard]] uint32_t GetSampleRate() const override;
-        [[nodiscard]] double GetGain() const override;
+        [[nodiscard]] double GetLNAGain() const;
         [[nodiscard]] double GetGain(std::string_view name) const override;
-        [[nodiscard]] std::string GetGainMode() const override;
+        [[nodiscard]] GainMode GetGainMode() const override;
+        [[nodiscard]] MetaRange GetGainRange() const;
 
-        [[nodiscard]] Gain GetGainStage() const override;
-        [[nodiscard]] std::vector<Gain> GetGainStages() const override;
+        [[nodiscard]] std::vector<Gain> GetGainStages(GainMode mode) const override;
 
     private:
         static void RTLSDRCallback(unsigned char* buf, uint32_t len, void* ctx);

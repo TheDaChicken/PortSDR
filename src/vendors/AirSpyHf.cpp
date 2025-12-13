@@ -121,7 +121,7 @@ PortSDR::ErrorCode PortSDR::AirSpyHfStream::SetCenterFrequency(uint32_t freq)
         return ErrorCode::UNKNOWN;
     }
 
-            m_freq = freq;
+    m_freq = freq;
     return ErrorCode::OK;
 }
 
@@ -138,11 +138,6 @@ PortSDR::ErrorCode PortSDR::AirSpyHfStream::SetSampleRate(uint32_t sampleRate)
 
     m_sampleRate = sampleRate;
     return ErrorCode::OK;
-}
-
-PortSDR::ErrorCode PortSDR::AirSpyHfStream::SetGain(double gain)
-{
-    return ErrorCode::INVALID_ARGUMENT; // AirSpy HF does not support gain control
 }
 
 PortSDR::ErrorCode PortSDR::AirSpyHfStream::SetSampleFormat(SampleFormat format)
@@ -170,8 +165,11 @@ PortSDR::ErrorCode PortSDR::AirSpyHfStream::SetGain(double gain, std::string_vie
     return ErrorCode::INVALID_ARGUMENT;
 }
 
-PortSDR::ErrorCode PortSDR::AirSpyHfStream::SetGainModes(std::string_view name)
+PortSDR::ErrorCode PortSDR::AirSpyHfStream::SetGainMode(const GainMode mode)
 {
+    if (mode == GAIN_MODE_FREE)
+        return ErrorCode::OK;
+
     return ErrorCode::INVALID_ARGUMENT;
 }
 
@@ -214,16 +212,14 @@ std::vector<std::string> PortSDR::AirSpyHfStream::GetGainModes() const
     return {};
 }
 
-PortSDR::Gain PortSDR::AirSpyHfStream::GetGainStage() const
-{
-    return {};
-}
-
-std::vector<PortSDR::Gain> PortSDR::AirSpyHfStream::GetGainStages() const
+std::vector<PortSDR::Gain> PortSDR::AirSpyHfStream::GetGainStages(GainMode mode) const
 {
     std::vector<Gain> gains;
 
-    gains.emplace_back("ATT", MetaRange{0, 8, 1});
+    if (GAIN_MODE_FREE == mode)
+    {
+        gains.emplace_back("ATT", MetaRange{0, 8, 1});
+    }
 
     return gains;
 }
@@ -238,19 +234,14 @@ uint32_t PortSDR::AirSpyHfStream::GetSampleRate() const
     return m_sampleRate;
 }
 
-double PortSDR::AirSpyHfStream::GetGain() const
-{
-    return 0;
-}
-
 double PortSDR::AirSpyHfStream::GetGain(std::string_view name) const
 {
     return 0;
 }
 
-std::string PortSDR::AirSpyHfStream::GetGainMode() const
+PortSDR::GainMode PortSDR::AirSpyHfStream::GetGainMode() const
 {
-    return ""; // AirSpy HF does not support gain modes
+    return GAIN_MODE_FREE; // AirSpy HF does not support gain modes
 }
 
 PortSDR::SampleFormat PortSDR::AirSpyHfStream::getNativeSampleFormat()

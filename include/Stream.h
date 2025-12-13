@@ -19,6 +19,13 @@ namespace PortSDR
         SAMPLE_FORMAT_IQ_FLOAT32,
     };
 
+    enum GainMode : int
+    {
+        GAIN_MODE_FREE = 0,
+        GAIN_MODE_LINEARITY,
+        GAIN_MODE_SENSITIVITY,
+    };
+
     struct SDRTransfer
     {
         void* data;
@@ -81,9 +88,17 @@ namespace PortSDR
         virtual ErrorCode SetCenterFrequency(uint32_t freq) = 0;
         virtual ErrorCode SetSampleFormat(SampleFormat format) = 0;
 
-        virtual ErrorCode SetGain(double gain) = 0;
+        //virtual ErrorCode SetGain(double gain) = 0;
         virtual ErrorCode SetGain(double gain, std::string_view name) = 0;
-        virtual ErrorCode SetGainModes(std::string_view name) = 0;
+
+        /**
+         * Sets the gain mode of the underlying hardware
+         * Some hardware like the AirSpy MINI hardware has different modes for gain.
+         *
+         * @param mode specific of the gain mode.
+         * @return ret code.
+         */
+        virtual ErrorCode SetGainMode(GainMode mode) = 0;
 
         /**
          * Gets all sample rates supported by given SDR hardware.
@@ -105,22 +120,19 @@ namespace PortSDR
          * Gets default gain stage used in SetGain()
          * @return gain
          */
-        [[nodiscard]] virtual Gain GetGainStage() const = 0;
+        [[nodiscard]] virtual std::vector<Gain> GetGainStages() const
+        {
+            return GetGainStages(GAIN_MODE_FREE);
+        }
 
         /**
-         * Gets all gain stages for the underlying radio hardware.
+         * Gets gain stages for the underlying radio hardware.
          * @return vector of gains containing the name of the gain and its range.
          */
-        [[nodiscard]] virtual std::vector<Gain> GetGainStages() const = 0;
+        [[nodiscard]] virtual std::vector<Gain> GetGainStages(GainMode mode) const = 0;
 
         [[nodiscard]] virtual uint32_t GetCenterFrequency() const = 0;
         [[nodiscard]] virtual uint32_t GetSampleRate() const = 0;
-
-        /**
-         * Gives the current gain of SDR device.
-         * @return the actual gain in dB
-         */
-        [[nodiscard]] virtual double GetGain() const = 0;
 
         /**
          * Gives current gain of SDR device.
@@ -129,7 +141,7 @@ namespace PortSDR
          */
         [[nodiscard]] virtual double GetGain(std::string_view name) const = 0;
 
-        [[nodiscard]] virtual std::string GetGainMode() const = 0;
+        [[nodiscard]] virtual GainMode GetGainMode() const = 0;
 
         int SetCallback(SDR_CALLBACK sdr_callback)
         {

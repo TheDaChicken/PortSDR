@@ -37,7 +37,7 @@ TEST(AnyTest, Devices)
     }
     std::cout << std::endl;
 
-    std::cout << "Gains: ";
+    std::cout << "Gains Stages: ";
     for (const auto& gain : stream->GetGainStages())
     {
         std::cout << gain.stage << " ";

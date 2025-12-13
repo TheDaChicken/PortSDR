@@ -250,12 +250,12 @@ PortSDR::ErrorCode PortSDR::RTLStream::SetGain(double gain, std::string_view nam
     }
     if ("LNA" == name)
     {
-        return SetGain(gain);
+        return SetRegularGain(gain);
     }
     return ErrorCode::INVALID_ARGUMENT;
 }
 
-PortSDR::ErrorCode PortSDR::RTLStream::SetGain(double gain)
+PortSDR::ErrorCode PortSDR::RTLStream::SetRegularGain(double gain) const
 {
     if (!m_dev)
         return ErrorCode::INVALID_ARGUMENT;
@@ -266,8 +266,11 @@ PortSDR::ErrorCode PortSDR::RTLStream::SetGain(double gain)
     return ErrorCode::OK;
 }
 
-PortSDR::ErrorCode PortSDR::RTLStream::SetGainModes(std::string_view mode)
+PortSDR::ErrorCode PortSDR::RTLStream::SetGainMode(GainMode mode)
 {
+    if (mode == GAIN_MODE_FREE)
+        return ErrorCode::OK;
+
     return ErrorCode::INVALID_ARGUMENT;
 }
 
@@ -291,7 +294,7 @@ uint32_t PortSDR::RTLStream::GetSampleRate() const
     return rtlsdr_get_sample_rate(m_dev);
 }
 
-double PortSDR::RTLStream::GetGain() const
+double PortSDR::RTLStream::GetLNAGain() const
 {
     if (!m_dev)
         return 0;
@@ -303,18 +306,34 @@ double PortSDR::RTLStream::GetGain(std::string_view name) const
 {
     if ("LNA" == name)
     {
-        return GetGain();
+        return GetLNAGain();
     }
 
     return 0;
 }
 
-std::string PortSDR::RTLStream::GetGainMode() const
+PortSDR::GainMode PortSDR::RTLStream::GetGainMode() const
 {
-    return "";
+    return GAIN_MODE_FREE;
 }
 
-PortSDR::Gain PortSDR::RTLStream::GetGainStage() const
+std::vector<PortSDR::Gain> PortSDR::RTLStream::GetGainStages(const GainMode mode) const
+{
+    std::vector<Gain> gain_stages;
+
+    if (mode == GAIN_MODE_FREE)
+    {
+        if (rtlsdr_get_tuner_type(m_dev) == RTLSDR_TUNER_E4000)
+        {
+            gain_stages.emplace_back("IF", MetaRange{3, 56, 1});
+        }
+
+        gain_stages.emplace_back("LNA", GetGainRange());
+    }
+    return gain_stages;
+}
+
+PortSDR::MetaRange PortSDR::RTLStream::GetGainRange() const
 {
     MetaRange range;
 
@@ -323,9 +342,7 @@ PortSDR::Gain PortSDR::RTLStream::GetGainStage() const
 
     int count = rtlsdr_get_tuner_gains(m_dev, nullptr);
     if (count <= 0)
-    {
         return {};
-    }
 
     std::vector<int> gains(count);
 
@@ -333,20 +350,7 @@ PortSDR::Gain PortSDR::RTLStream::GetGainStage() const
     for (int i = 0; i < count; i++)
         range.emplace_back(static_cast<double>(gains[i]) / 10.0f);
 
-    return {"LNA", range};
-}
-
-std::vector<PortSDR::Gain> PortSDR::RTLStream::GetGainStages() const
-{
-    std::vector<Gain> gains;
-
-    if (rtlsdr_get_tuner_type(m_dev) == RTLSDR_TUNER_E4000)
-    {
-        gains.emplace_back("IF", MetaRange{3, 56, 1});
-    }
-
-    gains.emplace_back(GetGainStage());
-    return gains;
+    return range;
 }
 
 std::vector<uint32_t> PortSDR::RTLStream::GetSampleRates() const

@@ -59,10 +59,11 @@ TEST(AirSpy, Stream)
     ASSERT_EQ(stream->Start(), PortSDR::ErrorCode::OK) << "Failed to start stream";
 
     // Test Gain
-    const auto gainRange = stream->GetGainStage();
+    const auto gainStages = stream->GetGainStages();
+    const auto& gainStage = gainStages[0];
 
-    ASSERT_EQ(stream->SetGain(gainRange.range.Min()), PortSDR::ErrorCode::OK) << "Failed to set gain";
-    ASSERT_EQ(stream->SetGain(gainRange.range.Max()), PortSDR::ErrorCode::OK) << "Failed to set gain";
+    ASSERT_EQ(stream->SetGain(gainStage.range.Min(), gainStage.stage), PortSDR::ErrorCode::OK) << "Failed to set gain";
+    ASSERT_EQ(stream->SetGain(gainStage.range.Max(), gainStage.stage), PortSDR::ErrorCode::OK) << "Failed to set gain";
 
     // Test Frequency. Tune to some rando frequency.
     ASSERT_EQ(stream->SetCenterFrequency(100.7e6), PortSDR::ErrorCode::OK) << "Failed to set frequency";

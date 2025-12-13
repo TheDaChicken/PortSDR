@@ -161,30 +161,6 @@ PortSDR::ErrorCode PortSDR::AirSpyStream::SetSampleRate(uint32_t sampleRate)
     return ConvertRetToErrorCode(ret);
 }
 
-PortSDR::ErrorCode PortSDR::AirSpyStream::SetGain(const double gain)
-{
-    if (!m_device)
-        return ErrorCode::INVALID_ARGUMENT;
-
-    const int uint_gain = static_cast<uint8_t>(gain);
-
-    int ret = AIRSPY_ERROR_INVALID_PARAM;
-    if (m_gainMode == LINEARITY)
-    {
-        ret = airspy_set_linearity_gain(m_device, uint_gain);
-    }
-    else if (m_gainMode == SENSITIVITY)
-    {
-        ret = airspy_set_sensitivity_gain(m_device, uint_gain);
-    }
-
-    if (ret == AIRSPY_SUCCESS)
-    {
-        m_gain = uint_gain;
-    }
-    return ErrorCode::OK;
-}
-
 PortSDR::ErrorCode PortSDR::AirSpyStream::SetSampleFormat(SampleFormat format)
 {
     if (!m_device)
@@ -239,6 +215,31 @@ PortSDR::ErrorCode PortSDR::AirSpyStream::SetIfGain(double gain)
     return ConvertRetToErrorCode(ret);
 }
 
+
+PortSDR::ErrorCode PortSDR::AirSpyStream::SetRegularGain(const double gain)
+{
+    if (!m_device)
+        return ErrorCode::INVALID_ARGUMENT;
+
+    const int uint_gain = static_cast<uint8_t>(gain);
+
+    int ret = AIRSPY_ERROR_INVALID_PARAM;
+    if (m_gainMode == GAIN_MODE_LINEARITY)
+    {
+        ret = airspy_set_linearity_gain(m_device, uint_gain);
+    }
+    else if (m_gainMode == GAIN_MODE_SENSITIVITY)
+    {
+        ret = airspy_set_sensitivity_gain(m_device, uint_gain);
+    }
+
+    if (ret == AIRSPY_SUCCESS)
+    {
+        m_gain = uint_gain;
+    }
+    return ErrorCode::OK;
+}
+
 PortSDR::ErrorCode PortSDR::AirSpyStream::SetGain(double gain, std::string_view name)
 {
     if (!m_device)
@@ -256,22 +257,22 @@ PortSDR::ErrorCode PortSDR::AirSpyStream::SetGain(double gain, std::string_view 
     {
         return SetIfGain(gain);
     }
+    if ("Regular" == name)
+    {
+        return SetRegularGain(gain);
+    }
     return ErrorCode::INVALID_ARGUMENT;
 }
 
-PortSDR::ErrorCode PortSDR::AirSpyStream::SetGainModes(std::string_view name)
+PortSDR::ErrorCode PortSDR::AirSpyStream::SetGainMode(const GainMode mode)
 {
-    if ("LINEARITY" == name)
-    {
-        m_gainMode = LINEARITY;
-        return ErrorCode::OK;
-    }
-    if ("SENSITIVITY" == name)
-    {
-        m_gainMode = SENSITIVITY;
-        return ErrorCode::OK;
-    }
-    return ErrorCode::INVALID_ARGUMENT;
+    if (mode != GAIN_MODE_FREE
+        && mode != GAIN_MODE_LINEARITY
+        && mode != GAIN_MODE_SENSITIVITY)
+        return ErrorCode::INVALID_ARGUMENT;
+
+    m_gainMode = mode;
+    return ErrorCode::OK;
 }
 
 std::vector<uint32_t> PortSDR::AirSpyStream::GetSampleRates() const
@@ -302,18 +303,26 @@ std::vector<std::string> PortSDR::AirSpyStream::GetGainModes() const
     return {"LINEARITY", "SENSITIVITY"};
 }
 
-PortSDR::Gain PortSDR::AirSpyStream::GetGainStage() const
+std::vector<PortSDR::Gain> PortSDR::AirSpyStream::GetGainStages() const
 {
-    return {"Gain", MetaRange(0, 21, 1)};
+    return GetGainStages(m_gainMode);
 }
 
-std::vector<PortSDR::Gain> PortSDR::AirSpyStream::GetGainStages() const
+std::vector<PortSDR::Gain> PortSDR::AirSpyStream::GetGainStages(const GainMode mode) const
 {
     std::vector<Gain> ranges;
 
-    ranges.emplace_back("LNA", MetaRange{0, 15, 1});
-    ranges.emplace_back("MIX", MetaRange{0, 15, 1});
-    ranges.emplace_back("IF", MetaRange{0, 15, 1});
+    if (mode == GAIN_MODE_FREE)
+    {
+        ranges.emplace_back("LNA", MetaRange{0, 15, 1});
+        ranges.emplace_back("MIX", MetaRange{0, 15, 1});
+        ranges.emplace_back("IF", MetaRange{0, 15, 1});
+    }
+
+    if (mode == GAIN_MODE_LINEARITY || mode == GAIN_MODE_SENSITIVITY)
+    {
+        ranges.emplace_back("Regular", MetaRange(0, 21, 1));
+    }
 
     return ranges;
 }
@@ -333,11 +342,6 @@ uint32_t PortSDR::AirSpyStream::GetSampleRate() const
     return m_sampleRate;
 }
 
-double PortSDR::AirSpyStream::GetGain() const
-{
-    return m_gain;
-}
-
 double PortSDR::AirSpyStream::GetGain(std::string_view name) const
 {
     if (name == "LNA")
@@ -346,12 +350,14 @@ double PortSDR::AirSpyStream::GetGain(std::string_view name) const
         return m_mixGain;
     if (name == "IF")
         return m_ifGain;
+    if (name == "Regular")
+        return m_gain;
     return 0.0;
 }
 
-std::string PortSDR::AirSpyStream::GetGainMode() const
+PortSDR::GainMode PortSDR::AirSpyStream::GetGainMode() const
 {
-    return m_gainMode == LINEARITY ? "LINEARITY" : "SENSITIVITY";
+    return m_gainMode;
 }
 
 airspy_sample_type PortSDR::AirSpyStream::ConvertToSampleType(const SampleFormat format)

@@ -32,11 +32,10 @@ namespace PortSDR
 
         ErrorCode SetCenterFrequency(uint32_t freq) override;
         ErrorCode SetSampleRate(uint32_t sampleRate) override;
-        ErrorCode SetGain(double gain) override;
         ErrorCode SetSampleFormat(SampleFormat format) override;
 
         ErrorCode SetGain(double gain, std::string_view name) override;
-        ErrorCode SetGainModes(std::string_view name) override;
+        ErrorCode SetGainMode(GainMode mode) override;
 
         ErrorCode SetAttenuation(double attenuation);
 
@@ -44,14 +43,12 @@ namespace PortSDR
         [[nodiscard]] std::vector<SampleFormat> GetSampleFormats() const override;
 
         [[nodiscard]] std::vector<std::string> GetGainModes() const override;
-        [[nodiscard]] Gain GetGainStage() const override;
-        [[nodiscard]] std::vector<Gain> GetGainStages() const override;
+        [[nodiscard]] std::vector<Gain> GetGainStages(GainMode mode) const override;
 
         [[nodiscard]] uint32_t GetCenterFrequency() const override;
         [[nodiscard]] uint32_t GetSampleRate() const override;
-        [[nodiscard]] double GetGain() const override;
         [[nodiscard]] double GetGain(std::string_view name) const override;
-        [[nodiscard]] std::string GetGainMode() const override;
+        [[nodiscard]] GainMode GetGainMode() const override;
 
     private:
         [[nodiscard]] static SampleFormat getNativeSampleFormat();

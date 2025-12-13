@@ -86,7 +86,7 @@ The stream object allows you to get the capabilities of the device.
 
 `GetGainModes` is used to get the available gain modes.
 
-`GetGainRanges` function returns a vector of all gain stages which can be used by `SetGain`.
+`GetGainStage` function returns a vector of all gain stages which can be used by `SetGain`.
 
 `GetSampleRates` returns a vector of all available sample rates.
 
@@ -124,8 +124,8 @@ int main()
     }
     std::cout << std::endl;
     
-    std::cout << "Gains: ";
-    for (const auto& gain : stream->GetGainRanges())
+    std::cout << "Gains Stages: ";
+    for (const auto& gain : stream->GetGainStage())
     {
         std::cout << gain.stage << " ";
         std::cout << gain.range.min() << " ";
@@ -137,11 +137,9 @@ int main()
 
 ### Gain Control
 
-There are two ways to control the gain:
-- `SetGain(int)` which allows you to set the gain of all stages at once.
-- `SetGain(int, std::string_view)` which allows you to freely control gain given a gain stage.
+- `SetGain(double gain, std::string_view stage)` which allows you to freely control gain given a gain stage.
 
-Depending on the device, there are also different gain modes for `SetGain(int)`
+Depending on the device, there are also different gain modes with different stages.
 
 For AirSpy Mini/R2 devices gain modes:
 - Linearity
