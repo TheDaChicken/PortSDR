@@ -61,6 +61,8 @@ PortSDR::DeviceInfo PortSDR::RTLStream::GetUSBStrings()
     char product[MAX_STR_SIZE];
     char serial[MAX_STR_SIZE];
 
+    device.name = "RTL-SDR";
+
     memset(manufact, 0, sizeof(manufact));
     memset(product, 0, sizeof(product));
     memset(serial, 0, sizeof(serial));
@@ -68,7 +70,7 @@ PortSDR::DeviceInfo PortSDR::RTLStream::GetUSBStrings()
     if (rtlsdr_get_usb_strings(m_dev, manufact, product, serial) == 0)
     {
         device.serial = serial;
-        device.name = string_format("%s %s SN: %s", manufact, product, serial);
+        device.name += string_format(" %s %s SN: %s", manufact, product, serial);
     }
 
     return device;

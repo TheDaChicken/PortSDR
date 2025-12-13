@@ -102,6 +102,10 @@ PortSDR::DeviceInfo PortSDR::AirSpyStream::GetUSBStrings()
     {
         device.name = airspy_board_id_name(static_cast<airspy_board_id>(board_id));
     }
+    else
+    {
+        device.name = "AIRSPY";
+    }
 
     if (airspy_board_partid_serialno_read(
         m_device, &read_partid_serialno) == AIRSPY_SUCCESS)

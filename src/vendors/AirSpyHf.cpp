@@ -75,6 +75,8 @@ PortSDR::DeviceInfo PortSDR::AirSpyHfStream::GetUSBStrings()
     DeviceInfo device;
     airspyhf_read_partid_serialno_t read_partid_serialno;
 
+    device.name = "AIRSPY HF";
+
     if (airspyhf_board_partid_serialno_read(
         m_device,
         &read_partid_serialno) == AIRSPYHF_SUCCESS)
