@@ -298,9 +298,9 @@ std::vector<uint32_t> PortSDR::AirSpyStream::GetSampleRates() const
     return sampleRates;
 }
 
-std::vector<std::string> PortSDR::AirSpyStream::GetGainModes() const
+std::vector<PortSDR::GainMode> PortSDR::AirSpyStream::GetGainModes() const
 {
-    return {"LINEARITY", "SENSITIVITY"};
+    return {GAIN_MODE_FREE, GAIN_MODE_LINEARITY, GAIN_MODE_SENSITIVITY};
 }
 
 std::vector<PortSDR::Gain> PortSDR::AirSpyStream::GetGainStages() const

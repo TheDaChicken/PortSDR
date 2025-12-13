@@ -114,7 +114,7 @@ namespace PortSDR
          */
         [[nodiscard]] virtual std::vector<SampleFormat> GetSampleFormats() const = 0;
 
-        [[nodiscard]] virtual std::vector<std::string> GetGainModes() const = 0;
+        [[nodiscard]] virtual std::vector<GainMode> GetGainModes() const = 0;
 
         /**
          * Gets default gain stage used in SetGain()

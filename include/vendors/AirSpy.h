@@ -45,7 +45,7 @@ namespace PortSDR
         [[nodiscard]] std::vector<uint32_t> GetSampleRates() const override;
         [[nodiscard]] std::vector<SampleFormat> GetSampleFormats() const override;
 
-        [[nodiscard]] std::vector<std::string> GetGainModes() const override;
+        [[nodiscard]] std::vector<GainMode> GetGainModes() const override;
         [[nodiscard]] std::vector<Gain> GetGainStages() const override;
         [[nodiscard]] std::vector<Gain> GetGainStages(GainMode mode) const override;
 

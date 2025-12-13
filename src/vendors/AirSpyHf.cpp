@@ -207,9 +207,9 @@ std::vector<PortSDR::SampleFormat> PortSDR::AirSpyHfStream::GetSampleFormats() c
     return {getNativeSampleFormat()};
 }
 
-std::vector<std::string> PortSDR::AirSpyHfStream::GetGainModes() const
+std::vector<PortSDR::GainMode> PortSDR::AirSpyHfStream::GetGainModes() const
 {
-    return {};
+    return {GAIN_MODE_FREE};
 }
 
 std::vector<PortSDR::Gain> PortSDR::AirSpyHfStream::GetGainStages(GainMode mode) const

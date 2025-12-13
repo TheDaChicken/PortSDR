@@ -374,9 +374,9 @@ std::vector<uint32_t> PortSDR::RTLStream::GetSampleRates() const
     return range;
 }
 
-std::vector<std::string> PortSDR::RTLStream::GetGainModes() const
+std::vector<PortSDR::GainMode> PortSDR::RTLStream::GetGainModes() const
 {
-    return {};
+    return {GAIN_MODE_FREE};
 }
 
 std::vector<PortSDR::SampleFormat> PortSDR::RTLStream::GetSampleFormats() const
