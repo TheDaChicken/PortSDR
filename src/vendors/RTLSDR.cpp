@@ -137,7 +137,7 @@ PortSDR::ErrorCode PortSDR::RTLStream::Start()
 
 PortSDR::ErrorCode PortSDR::RTLStream::Stop()
 {
-    if (!m_dev && !m_thread.joinable())
+    if (!m_dev || !m_thread.joinable())
         return ErrorCode::INVALID_ARGUMENT;
 
     rtlsdr_cancel_async(m_dev);
