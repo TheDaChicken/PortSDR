@@ -5,6 +5,8 @@
 #ifndef RTLSDR_H
 #define RTLSDR_H
 
+#include <atomic>
+
 #include "PortSDR.h"
 #include "rtl-sdr.h"
 
@@ -62,6 +64,7 @@ namespace PortSDR
     private:
         rtlsdr_dev_t* m_dev{nullptr};
         std::thread m_thread;
+        std::atomic<bool> running;
     };
 }
 

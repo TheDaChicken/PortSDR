@@ -131,6 +131,7 @@ PortSDR::ErrorCode PortSDR::RTLStream::Start()
     if (m_thread.joinable())
         return ErrorCode::OK;
 
+    running = true;
     m_thread = std::thread(&RTLStream::Process, this);
     return ErrorCode::OK;
 }
@@ -140,7 +141,7 @@ PortSDR::ErrorCode PortSDR::RTLStream::Stop()
     if (!m_dev || !m_thread.joinable())
         return ErrorCode::INVALID_ARGUMENT;
 
-    rtlsdr_cancel_async(m_dev);
+    running = false;
     m_thread.join();
     return ErrorCode::OK;
 }
@@ -388,8 +389,13 @@ std::vector<PortSDR::SampleFormat> PortSDR::RTLStream::GetSampleFormats() const
 
 void PortSDR::RTLStream::RTLSDRCallback(unsigned char* buf, uint32_t len, void* ctx)
 {
-    const auto* obj = static_cast<RTLStream*>(ctx);
-    assert(obj != nullptr);
+    const auto* stream = static_cast<RTLStream*>(ctx);
+    assert(stream != nullptr);
+
+    if (!stream->running)
+    {
+        rtlsdr_cancel_async(stream->m_dev);
+    }
 
     SDRTransfer transfer{};
 
@@ -397,7 +403,7 @@ void PortSDR::RTLStream::RTLSDRCallback(unsigned char* buf, uint32_t len, void* 
     transfer.data = buf;
     transfer.frame_size = len / 2;
 
-    obj->m_callback(transfer);
+    stream->m_callback(transfer);
 }
 
 void PortSDR::RTLStream::Process()
