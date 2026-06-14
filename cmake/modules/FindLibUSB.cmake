@@ -7,13 +7,13 @@ if (PKG_CONFIG_FOUND)
 endif ()
 
 find_path(LibUSB_INCLUDE_DIR
-        NAMES LibUSB.h
+        NAMES libusb.h
         HINTS ${PC_LibUSB_INCLUDEDIR}
-        PATH_SUFFIXES include LibUSB include/LibUSB-1.0
+        ATH_SUFFIXES include libusb include/libusb-1.0
 )
 
 find_library(LibUSB_LIBRARIES
-        NAMES LibUSB-1.0.so LibUSB-1.0.a
+        NAMES libusb-1.0.so libusb-1.0.a
         HINTS ${PC_LibUSB_LIBDIR} $ENV{LibUSB_ROOT}/include/LibUSB-1.0
         PATH_SUFFIXES lib
         PATHS /usr/local/lib /usr/lib
