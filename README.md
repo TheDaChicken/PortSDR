@@ -5,18 +5,15 @@ designed to support many SDR vendors.
 
 ## Why not use SoapySDR instead?
 
-SoapySDR is a great library for interfacing with SDR devices.
-However, it is not very easy to use for general-users:
+Since SoapySDR is based on user installed plugins, this may bring complexity to the user. Users are required to compile a plugin for each vendor.
 
-- it's a plugin based system.
-- It requires compiling/installing a plugin for each vendor you want to use.
-
-PortSDR is meant to be a lot easier to use
+PortSDR is meant to be a lot easier to quickly bring support for a ton of vendors.
 
 ## Supported Devices
 
 - RTL-SDR (with librtlsdr)
 - AIRSPY Mini / R2 (with libairspy)
+- AIRSPY HF+ Discovery (with libairspyhf)
 
 ## Building
 
@@ -185,31 +182,9 @@ int main()
 
 ```
 
-## Converters
-
-Some SDR libraries support different sample formats. Some don't.
-This library contains automatic converters to convert the samples to any format you want.
-
-### Automatic conversion
-
-```cpp
-// ... Get the device 
-
-// Open the device
-std::unique_ptr<PortSDR::Stream> stream = device->CreateStream();
-
-// Set the sample format to 16-bit
-stream->SetSampleFormat(PortSDR::SAMPLE_FORMAT_IQ_INT16);
-```
-
-Currently supported formats from SDR vendors:
-
-- RTLSDR: 8-bit (uint8_t)
-- AIRSPY: 16-bit (int16_t), 32-bit (float)
-
 ## Goals 
-- Add more automatic type converters for different SDR devices.
-- Maybe use libvolk optionally for SIMD optimizations of automatic converters.
+- Do I want to create a class to automatically do quantization
+      - Maybe use libvolk optionally for SIMD optimizations of automatic converters.
 - Add more SDR vendors support.
 
 ## Remarks

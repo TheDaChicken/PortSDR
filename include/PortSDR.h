@@ -27,29 +27,5 @@ namespace PortSDR
     private:
         std::vector<std::shared_ptr<Host>> m_hosts;
     };
-
-    class IQConverterUINT8ToINT16
-    {
-    public:
-        IQConverterUINT8ToINT16();
-
-        void Process(
-            const uint8_t* data,
-            int16_t* output, std::size_t elementSize) const;
-
-    private:
-        std::vector<int16_t> m_lut;
-    };
-
-    class IQConverterINT16ToFLOAT
-    {
-    public:
-        IQConverterINT16ToFLOAT();
-
-        void Process(const uint8_t* data, float* output, std::size_t elementSize) const;
-
-    private:
-        std::vector<float> m_lut;
-    };
 }
 #endif //PORTSDR_LIBRARY_H
