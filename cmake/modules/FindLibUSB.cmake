@@ -3,7 +3,7 @@ include(FindPackageHandleStandardArgs)
 find_package(PkgConfig)
 
 if (PKG_CONFIG_FOUND)
-    pkg_check_modules(PC_LibUSB LibUSB-1.0)
+    pkg_check_modules(PC_LibUSB libusb-1.0)
 endif ()
 
 find_path(LibUSB_INCLUDE_DIR
