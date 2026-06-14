@@ -9,12 +9,12 @@ endif ()
 find_path(LibUSB_INCLUDE_DIR
         NAMES libusb.h
         HINTS ${PC_LibUSB_INCLUDEDIR}
-        ATH_SUFFIXES include libusb include/libusb-1.0
+        PATH_SUFFIXES include libusb include/libusb-1.0
 )
 
 find_library(LibUSB_LIBRARIES
         NAMES libusb-1.0.so libusb-1.0.a
-        HINTS ${PC_LibUSB_LIBDIR} $ENV{LibUSB_ROOT}/include/LibUSB-1.0
+        HINTS ${PC_LibUSB_LIBDIR} $ENV{LibUSB_ROOT}/include/libusb-1.0
         PATH_SUFFIXES lib
         PATHS /usr/local/lib /usr/lib
 )
