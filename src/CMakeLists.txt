@@ -6,7 +6,7 @@ set(PortSDR_PUBLIC_HEADER
     ../include/Device.h
     ../include/Stream.h
     ../include/Error.h
-        ../include/HostType.h
+    ../include/HostType.h
 )
 
 if (RTLSDR_FOUND)
@@ -14,23 +14,23 @@ if (RTLSDR_FOUND)
             vendors/RTLSDR.h
             vendors/RTLSDR.cpp
     )
-    list(APPEND PortSDR_LIBRARIES rtlsdr::rtlsdr)
+    list(APPEND PortSDR_LIBRARIES RTLSDR::RTLSDR)
 endif ()
 
-if (LIBAIRSPY_FOUND)
+if (AIRSPY_FOUND)
     list(APPEND PortSDR_VENDOR_FILES
             vendors/AirSpy.h
             vendors/AirSpy.cpp
     )
-    list(APPEND PortSDR_LIBRARIES libairspy::libairspy)
+    list(APPEND PortSDR_LIBRARIES AIRSPY::AIRSPY)
 endif ()
 
-if (LIBAIRSPYHF_FOUND)
+if (AIRSPYHF_FOUND)
     list(APPEND PortSDR_VENDOR_FILES
             vendors/AirSpyHf.h
             vendors/AirSpyHf.cpp
     )
-    list(APPEND PortSDR_LIBRARIES libairspyhf::libairspyhf)
+    list(APPEND PortSDR_LIBRARIES AIRSPYHF::AIRSPYHF)
 endif()
 
 add_library(${PortSDR_LIBRARY_NAME}

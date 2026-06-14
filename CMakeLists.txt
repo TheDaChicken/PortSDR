@@ -26,6 +26,7 @@ else ()
 endif ()
 
 include(${PROJECT_SOURCE_DIR}/cmake/CheckVersion.cmake)
+include(${PROJECT_SOURCE_DIR}/cmake/DependencyManager.cmake)
 
 set(PortSDR_LIBRARIES "")
 set(PortSDR_VENDOR_FILES "")
