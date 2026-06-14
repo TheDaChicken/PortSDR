@@ -2,11 +2,11 @@
 // Created by TheDaChicken on 7/10/2025.
 //
 
-#include "vendors/AirSpyHf.h"
+#include "AirSpyHf.h"
 
 #include "../Utils.h"
 
-PortSDR::AirSpyHfHost::AirSpyHfHost() : Host(AIRSPY_HF)
+PortSDR::AirSpyHfHost::AirSpyHfHost() : Host(HostType::AIRSPY_HF)
 {
 }
 
@@ -15,7 +15,7 @@ std::vector<PortSDR::Device> PortSDR::AirSpyHfHost::AvailableDevices() const
     std::vector<Device> devices;
 
     const int device_count = airspyhf_list_devices(nullptr, 0);
-    if (device_count == 0)
+    if (device_count <= 0)
         return {};
 
     uint64_t serials[device_count];
@@ -31,12 +31,12 @@ std::vector<PortSDR::Device> PortSDR::AirSpyHfHost::AvailableDevices() const
 
         device.serial = string_format("%016llX",
                                       serials[i]);
-        device.host = shared_from_this();
+        device.type = GetType();
     }
     return devices;
 }
 
-std::unique_ptr<PortSDR::Stream> PortSDR::AirSpyHfHost::CreateStream() const
+std::unique_ptr<PortSDR::StreamImpl> PortSDR::AirSpyHfHost::CreateStream() const
 {
     return std::make_unique<AirSpyHfStream>();
 }
@@ -49,16 +49,16 @@ PortSDR::AirSpyHfStream::~AirSpyHfStream()
     }
 }
 
-PortSDR::ErrorCode PortSDR::AirSpyHfStream::Initialize(const std::string_view index)
+PortSDR::ErrorCode PortSDR::AirSpyHfStream::Initialize(const Device& device)
 {
     if (m_device)
         return ErrorCode::INVALID_ARGUMENT;
 
-    if (index.size() != 16)
+    if (device.serial.size() != 16)
         return ErrorCode::INVALID_ARGUMENT;
 
     const uint64_t num = strtoull(
-        index.data(),
+        device.serial.c_str(),
         nullptr,
         16);
     const int ret = airspyhf_open_sn(&m_device, num);

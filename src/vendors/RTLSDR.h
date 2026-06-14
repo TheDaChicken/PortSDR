@@ -7,7 +7,7 @@
 
 #include <atomic>
 
-#include "PortSDR.h"
+#include "../Host.h"
 #include "rtl-sdr.h"
 
 #include <thread>
@@ -20,15 +20,15 @@ namespace PortSDR
         RTLHost();
 
         [[nodiscard]] std::vector<Device> AvailableDevices() const override;
-        [[nodiscard]] std::unique_ptr<Stream> CreateStream() const override;
+        [[nodiscard]] std::unique_ptr<StreamImpl> CreateStream() const override;
     };
 
-    class RTLStream final : public Stream
+    class RTLStream final : public StreamImpl
     {
     public:
         ~RTLStream() override;
 
-        ErrorCode Initialize(std::string_view serial) override;
+        ErrorCode Initialize(const Device& device) override;
         DeviceInfo GetUSBStrings() override;
 
         ErrorCode Start() override;

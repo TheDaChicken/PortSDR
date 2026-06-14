@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <functional>
 
+#include "Error.h"
 #include "Ranges.h"
 
 namespace PortSDR
@@ -41,23 +42,6 @@ namespace PortSDR
 
         Stream() = default;
         virtual ~Stream() = default;
-
-        /**
-         * Opens device
-         * @param serial serial of the device.
-         * @return status code.
-         */
-        virtual ErrorCode Initialize(std::string_view serial) = 0;
-
-        /**
-         * Opens device
-         * @param device device container
-         * @return status code.
-         */
-        ErrorCode Initialize(const Device& device)
-        {
-            return Initialize(device.serial);
-        };
 
         /**
          * Gets
@@ -148,7 +132,6 @@ namespace PortSDR
             m_callback = std::move(sdr_callback);
             return 0;
         }
-
     protected:
         SDR_CALLBACK m_callback;
     };

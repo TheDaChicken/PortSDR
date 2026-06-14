@@ -9,11 +9,7 @@
 TEST(AirSpy, Devices)
 {
     PortSDR::PortSDR portSDR;
-    const std::shared_ptr<PortSDR::Host> sdrHost = portSDR.GetHost(PortSDR::Host::AIRSPY);
-
-    ASSERT_TRUE(sdrHost);
-
-    const auto devices = sdrHost->AvailableDevices();
+    const std::vector<PortSDR::Device> devices = portSDR.GetHostDevices(PortSDR::HostType::AIRSPY);
 
     ASSERT_FALSE(devices.empty()) << "No devices found";
 
@@ -30,18 +26,15 @@ TEST(AirSpy, Devices)
 TEST(AirSpy, Stream)
 {
     PortSDR::PortSDR portSDR;
-    std::shared_ptr<PortSDR::Host> sdrHost = portSDR.GetHost(PortSDR::Host::AIRSPY);
-
-    ASSERT_TRUE(sdrHost);
-
-    const std::vector<PortSDR::Device>& devices = sdrHost->AvailableDevices();
+    const std::vector<PortSDR::Device> devices = portSDR.GetHostDevices(PortSDR::HostType::AIRSPY);
 
     ASSERT_TRUE(!devices.empty());
 
     const auto& device = devices.front();
-    auto stream = sdrHost->CreateStream();
+    std::unique_ptr<PortSDR::Stream> stream;
+    const auto result = portSDR.CreateStream(device, stream);
 
-    ASSERT_EQ(stream->Initialize(device), PortSDR::ErrorCode::OK) << "Failed to initialize stream";
+    ASSERT_TRUE(result == PortSDR::ErrorCode::OK);
 
     // Test sample rates
     const auto sampleRates = stream->GetSampleRates();

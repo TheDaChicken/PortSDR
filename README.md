@@ -1,7 +1,6 @@
 PortSDR: Interfacing with SDR devices
 ========================================
-PortSDR is a C++ library for interfacing with SDR devices. It is designed to be simple and easy to use. The library is
-designed to support many SDR vendors.
+PortSDR is a C++ library for interfacing with SDR devices. It is designed to be simple and easy to use while supporting many SDR vendors.
 
 ## Why not use SoapySDR instead?
 
@@ -64,7 +63,7 @@ int main()
     // Open the stream from the device
     std::unique_ptr<PortSDR::Stream> stream;
     
-    auto ret = device->CreateStream(stream);
+    auto ret = sdr.CreateStream(*device, stream);
     if (ret != PortSDR::ErrorCode::OK)
     {
         std::cerr << "Failed to open the device" << std::endl;
@@ -106,7 +105,7 @@ int main()
     // Open the device
     std::unique_ptr<PortSDR::Stream> stream;
     
-    auto ret = device->CreateStream(stream);
+    auto ret = sdr.CreateStream(*device, stream);
     if (ret != PortSDR::ErrorCode::OK)
     {
         std::cerr << "Failed to open the device" << std::endl;
@@ -152,10 +151,7 @@ For AirSpy Mini/R2 devices gain modes:
 
 int main()
 {
-    // ... etc Open the device
-    
-    // Create Stream
-    std::unique_ptr<PortSDR::Stream> stream = device.CreateStream();
+    // ... etc Create stream
     
     // Set callback
     stream->SetCallback([](PortSDR::SDRTransfer& transfer)

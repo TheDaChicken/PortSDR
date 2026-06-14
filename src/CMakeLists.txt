@@ -5,13 +5,13 @@ set(PortSDR_PUBLIC_HEADER
     ../include/Ranges.h
     ../include/Device.h
     ../include/Stream.h
-    ../include/Host.h
     ../include/Error.h
+        ../include/HostType.h
 )
 
 if (RTLSDR_FOUND)
     list(APPEND PortSDR_VENDOR_FILES
-            ../include/vendors/RTLSDR.h
+            vendors/RTLSDR.h
             vendors/RTLSDR.cpp
     )
     list(APPEND PortSDR_LIBRARIES rtlsdr::rtlsdr)
@@ -19,7 +19,7 @@ endif ()
 
 if (LIBAIRSPY_FOUND)
     list(APPEND PortSDR_VENDOR_FILES
-            ../include/vendors/AirSpy.h
+            vendors/AirSpy.h
             vendors/AirSpy.cpp
     )
     list(APPEND PortSDR_LIBRARIES libairspy::libairspy)
@@ -27,7 +27,7 @@ endif ()
 
 if (LIBAIRSPYHF_FOUND)
     list(APPEND PortSDR_VENDOR_FILES
-            ../include/vendors/AirSpyHf.h
+            vendors/AirSpyHf.h
             vendors/AirSpyHf.cpp
     )
     list(APPEND PortSDR_LIBRARIES libairspyhf::libairspyhf)
@@ -36,8 +36,8 @@ endif()
 add_library(${PortSDR_LIBRARY_NAME}
         ${LIBRARY_BUILD_TYPE}
         PortSDR.cpp
-        IQConverter.cpp
         Utils.h
+        Host.h
         ${PortSDR_VENDOR_FILES}
         ${PortSDR_PUBLIC_HEADER}
 )

@@ -2,7 +2,7 @@
 // Created by TheDaChicken on 12/17/2024.
 //
 
-#include "vendors/AirSpy.h"
+#include "AirSpy.h"
 
 #include <cassert>
 
@@ -29,7 +29,7 @@ static PortSDR::ErrorCode ConvertRetToErrorCode(const int airspy)
     }
 }
 
-PortSDR::AirSpyHost::AirSpyHost() : Host(AIRSPY)
+PortSDR::AirSpyHost::AirSpyHost() : Host(HostType::AIRSPY)
 {
 }
 
@@ -50,12 +50,12 @@ std::vector<PortSDR::Device> PortSDR::AirSpyHost::AvailableDevices() const
 
         device.serial = string_format("%016llX",
                                       serials[i]);
-        device.host = shared_from_this();
+        device.type = GetType();
     }
     return devices;
 }
 
-std::unique_ptr<PortSDR::Stream> PortSDR::AirSpyHost::CreateStream() const
+std::unique_ptr<PortSDR::StreamImpl> PortSDR::AirSpyHost::CreateStream() const
 {
     return std::make_unique<AirSpyStream>();
 }
@@ -66,16 +66,16 @@ PortSDR::AirSpyStream::~AirSpyStream()
         airspy_close(m_device);
 }
 
-PortSDR::ErrorCode PortSDR::AirSpyStream::Initialize(const std::string_view index)
+PortSDR::ErrorCode PortSDR::AirSpyStream::Initialize(const Device& device)
 {
     if (m_device)
         return ErrorCode::OK;
 
-    if (index.size() != 16)
+    if (device.serial.size() != 16)
         return ErrorCode::INVALID_ARGUMENT;
 
     const uint64_t num = strtoull(
-        index.data(),
+        device.serial.c_str(),
         nullptr,
         16);
 

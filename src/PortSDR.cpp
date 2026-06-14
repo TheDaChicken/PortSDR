@@ -27,39 +27,20 @@ PortSDR::PortSDR::PortSDR()
 {
     // Store all our supported SDR vendors
 #ifdef RTLSDR_SUPPORT
-    m_hosts.emplace_back(std::make_shared<RTLHost>());
+    m_hosts.emplace_back(std::make_unique<RTLHost>());
 #endif
 
 #ifdef AIRSPY_SUPPORT
-    m_hosts.emplace_back(std::make_shared<AirSpyHost>());
+    m_hosts.emplace_back(std::make_unique<AirSpyHost>());
 #endif
 
 #ifdef AIRSPYHF_SUPPORT
-    m_hosts.emplace_back(std::make_shared<AirSpyHfHost>());
+    m_hosts.emplace_back(std::make_unique<AirSpyHfHost>());
 #endif
 }
 
-std::vector<std::shared_ptr<PortSDR::Host>> PortSDR::PortSDR::GetHosts()
-{
-    return m_hosts;
-}
-
-std::shared_ptr<PortSDR::Host> PortSDR::PortSDR::GetHost(Host::HostType name)
-{
-    const auto iter =
-        std::find_if(m_hosts.begin(), m_hosts.end(),
-                     [name](const std::shared_ptr<Host>& key)
-                     {
-                         return key->GetType() == name;
-                     });
-
-    if (iter != m_hosts.end())
-    {
-        return *iter;
-    }
-
-    return {};
-}
+PortSDR::PortSDR::~PortSDR()
+= default;
 
 std::optional<PortSDR::Device> PortSDR::PortSDR::GetFirstAvailableSDR() const
 {
@@ -74,7 +55,7 @@ std::optional<PortSDR::Device> PortSDR::PortSDR::GetFirstAvailableSDR() const
     return {};
 }
 
-std::vector<PortSDR::Device> PortSDR::PortSDR::GetDevices()
+std::vector<PortSDR::Device> PortSDR::PortSDR::GetDevices() const
 {
     std::vector<Device> total_devices;
     for (const auto& host : m_hosts)
@@ -88,21 +69,29 @@ std::vector<PortSDR::Device> PortSDR::PortSDR::GetDevices()
     return total_devices;
 }
 
-PortSDR::ErrorCode PortSDR::Device::CreateStream(std::unique_ptr<Stream>& stream) const
+std::vector<PortSDR::Device> PortSDR::PortSDR::GetHostDevices(const HostType type) const
 {
-    const auto h = host.lock();
-    if (!h)
-        return ErrorCode::HOST_UNAVAILABLE;
-
-    return h->CreateAndInitializeStream(serial, stream);
+    if (const Host* host = GetHost(type))
+    {
+        return host->AvailableDevices();
+    }
+    return {};
 }
 
-PortSDR::ErrorCode PortSDR::Host::CreateAndInitializeStream(
-    const std::string_view serial,
-    std::unique_ptr<Stream>& stream) const
+PortSDR::ErrorCode PortSDR::PortSDR::CreateStream(const Device& device, std::unique_ptr<Stream>& stream) const
+{
+    if (const Host* host = GetHost(device.type))
+    {
+        return host->CreateAndInitializeStream(device, stream);
+    }
+
+    return ErrorCode::HOST_UNAVAILABLE;
+}
+
+PortSDR::ErrorCode PortSDR::Host::CreateAndInitializeStream(const Device& device, std::unique_ptr<Stream>& stream) const
 {
     auto new_stream = CreateStream();
-    const ErrorCode ret = new_stream->Initialize(serial);
+    const ErrorCode ret = new_stream->Initialize(device);
 
     if (ret < ErrorCode::OK)
     {
@@ -111,6 +100,21 @@ PortSDR::ErrorCode PortSDR::Host::CreateAndInitializeStream(
 
     stream = std::move(new_stream);
     return ret;
+}
+
+const PortSDR::Host* PortSDR::PortSDR::GetHost(HostType type) const
+{
+    const auto iter =
+       std::find_if(m_hosts.begin(), m_hosts.end(),
+                    [type](const std::unique_ptr<Host>& key)
+                    {
+                        return key->GetType() == type;
+                    });
+
+    if (iter == m_hosts.end())
+        return {};
+
+    return iter->get();
 }
 
 double PortSDR::MetaRange::Max() const

@@ -2,7 +2,7 @@
 // Created by TheDaChicken on 12/15/2024.
 //
 
-#include "vendors/RTLSDR.h"
+#include "RTLSDR.h"
 #include "rtl-sdr.h"
 
 #include <cassert>
@@ -19,7 +19,7 @@
 #define BUF_NUM  64
 #define BUF_LEN  (4 * 32 * 512) /* must be multiple of 512 */
 
-PortSDR::RTLHost::RTLHost() : Host(RTL_SDR)
+PortSDR::RTLHost::RTLHost() : Host(HostType::RTL_SDR)
 {
 }
 
@@ -45,7 +45,7 @@ std::vector<PortSDR::Device> PortSDR::RTLHost::AvailableDevices() const
         auto& device = devices[dev_id++];
 
         device.serial = serial;
-        device.host = shared_from_this();
+        device.type = GetType();
     }
 
     devices.resize(dev_id);
@@ -76,7 +76,7 @@ PortSDR::DeviceInfo PortSDR::RTLStream::GetUSBStrings()
     return device;
 }
 
-std::unique_ptr<PortSDR::Stream> PortSDR::RTLHost::CreateStream() const
+std::unique_ptr<PortSDR::StreamImpl> PortSDR::RTLHost::CreateStream() const
 {
     return std::make_unique<RTLStream>();
 }
@@ -92,14 +92,14 @@ PortSDR::RTLStream::~RTLStream()
     m_dev = nullptr;
 }
 
-PortSDR::ErrorCode PortSDR::RTLStream::Initialize(const std::string_view serial)
+PortSDR::ErrorCode PortSDR::RTLStream::Initialize(const Device& device)
 {
     int ret = 0;
 
     if (m_dev)
         return ErrorCode::INVALID_ARGUMENT;
 
-    const int index = rtlsdr_get_index_by_serial(serial.data());
+    const int index = rtlsdr_get_index_by_serial(device.serial.c_str());
     if (index < 0)
     {
         if (index == -2 || index == -1)

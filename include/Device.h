@@ -5,10 +5,9 @@
 #ifndef PORTSDR_DEVICE_H
 #define PORTSDR_DEVICE_H
 
-#include <cstdint>
 #include <string>
 
-#include "Error.h"
+#include "HostType.h"
 
 namespace PortSDR
 {
@@ -17,10 +16,8 @@ namespace PortSDR
 
     struct Device
     {
+        HostType type;
         std::string serial;
-        std::weak_ptr<const Host> host;
-
-        ErrorCode CreateStream(std::unique_ptr<Stream>& stream) const;
     };
 
     struct DeviceInfo

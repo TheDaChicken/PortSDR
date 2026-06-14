@@ -19,7 +19,7 @@ TEST(AnyTest, Devices)
     // Open the device
     std::unique_ptr<PortSDR::Stream> stream;
 
-    PortSDR::ErrorCode ret = device->CreateStream(stream);
+    PortSDR::ErrorCode ret = sdr.CreateStream(*device, stream);
     if (ret != PortSDR::ErrorCode::OK)
     {
         std::cerr << "Failed to open the device" << std::endl;
