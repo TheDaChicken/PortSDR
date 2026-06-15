@@ -15,7 +15,7 @@ find_path(RTLSDR_INCLUDE_DIR
         DOC "RTLSDR include directory"
 )
 find_library(RTLSDR_LIBRARIES
-        NAMES libRTLSDR_static libRTLSDR RTLSDR
+        NAMES librtlsdr_static librtlsdr rtlsdr
         PATHS ${PC_RTLSDR_LIBDIR}
         DOC "RTLSDR library location"
 )
