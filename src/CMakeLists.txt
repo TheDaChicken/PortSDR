@@ -1,12 +1,15 @@
 set(PortSDR_LIBRARY_NAME "PortSDR")
 
+set(PortSDR_VENDOR_FILES "")
+set(PortSDR_COMPILE_DEFINITIONS "")
+
 set(PortSDR_PUBLIC_HEADER
     ../include/PortSDR.h
     ../include/Ranges.h
     ../include/Device.h
     ../include/Stream.h
     ../include/Error.h
-        ../include/HostType.h
+    ../include/HostType.h
 )
 
 if (RTLSDR_FOUND)
@@ -14,23 +17,26 @@ if (RTLSDR_FOUND)
             vendors/RTLSDR.h
             vendors/RTLSDR.cpp
     )
-    list(APPEND PortSDR_LIBRARIES rtlsdr::rtlsdr)
+    list(APPEND PortSDR_COMPILE_DEFINITIONS RTLSDR_SUPPORT=ON)
+    list(APPEND PortSDR_LIBRARIES RTLSDR::RTLSDR)
 endif ()
 
-if (LIBAIRSPY_FOUND)
+if (AIRSPY_FOUND)
     list(APPEND PortSDR_VENDOR_FILES
             vendors/AirSpy.h
             vendors/AirSpy.cpp
     )
-    list(APPEND PortSDR_LIBRARIES libairspy::libairspy)
+    list(APPEND PortSDR_COMPILE_DEFINITIONS AIRSPY_SUPPORT=ON)
+    list(APPEND PortSDR_LIBRARIES AIRSPY::AIRSPY)
 endif ()
 
-if (LIBAIRSPYHF_FOUND)
+if (AIRSPYHF_FOUND)
     list(APPEND PortSDR_VENDOR_FILES
             vendors/AirSpyHf.h
             vendors/AirSpyHf.cpp
     )
-    list(APPEND PortSDR_LIBRARIES libairspyhf::libairspyhf)
+    list(APPEND PortSDR_COMPILE_DEFINITIONS AIRSPYHF_SUPPORT=ON)
+    list(APPEND PortSDR_LIBRARIES AIRSPYHF::AIRSPYHF)
 endif()
 
 add_library(${PortSDR_LIBRARY_NAME}
@@ -52,18 +58,7 @@ set_target_properties(${PortSDR_LIBRARY_NAME} PROPERTIES OUTPUT_NAME ${PortSDR_L
 set_target_properties(${PortSDR_LIBRARY_NAME} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 target_link_libraries(${PortSDR_LIBRARY_NAME} PUBLIC ${PortSDR_LIBRARIES})
-
-if (RTLSDR_FOUND)
-    target_compile_definitions(${PortSDR_LIBRARY_NAME} PUBLIC RTLSDR_SUPPORT=ON)
-endif ()
-
-if (LIBAIRSPY_FOUND)
-    target_compile_definitions(${PortSDR_LIBRARY_NAME} PUBLIC AIRSPY_SUPPORT=ON)
-endif ()
-
-if (LIBAIRSPYHF_FOUND)
-    target_compile_definitions(${PortSDR_LIBRARY_NAME} PUBLIC AIRSPYHF_SUPPORT=ON)
-endif()
+target_compile_definitions(${PortSDR_LIBRARY_NAME} PUBLIC ${PortSDR_COMPILE_DEFINITIONS})
 
 install(TARGETS ${PortSDR_LIBRARY_NAME}
         PUBLIC_HEADER DESTINATION include

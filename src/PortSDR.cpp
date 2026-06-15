@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "Error.h"
+#include "Host.h"
 
 #ifdef RTLSDR_SUPPORT
 #include "vendors/RTLSDR.h"
