@@ -21,8 +21,8 @@ endif ()
 FIND_PATH(AIRSPYHF_INCLUDE_DIR
         NAMES airspy.h
         HINTS $ENV{AIRSPYHF_DIR}/include ${PC_AIRSPYHF_INCLUDEDIR}
-        PATHS /usr/local/include/AIRSPYHF /usr/include/AIRSPYHF /usr/local/include
-        /usr/include ${CMAKE_SOURCE_DIR}/../AIRSPYHF/src /opt/local/include/AIRSPYHF
+        PATHS /usr/local/include/libairspyhf /usr/include/libairspyhf /usr/local/include
+        /usr/include /opt/local/include/libairspyhf
 )
 
 FIND_LIBRARY(AIRSPYHF_LIBRARIES

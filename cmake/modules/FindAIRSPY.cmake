@@ -24,8 +24,8 @@ endif ()
 FIND_PATH(AIRSPY_INCLUDE_DIR
         NAMES airspy.h
         HINTS $ENV{AIRSPY_DIR}/include ${PC_AIRSPY_INCLUDEDIR}
-        PATHS /usr/local/include/AIRSPY /usr/include/AIRSPY /usr/local/include
-        /usr/include /opt/local/include/AIRSPY
+        PATHS /usr/local/include/libairspy /usr/include/libairspy /usr/local/include
+        /usr/include /opt/local/include/libairspy
 )
 
 find_library(AIRSPY_LIBRARIES
