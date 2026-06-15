@@ -1,5 +1,5 @@
 if (NOT RTLSDR_FOUND)
-    # find_package(RTLSDR)
+    find_package(RTLSDR)
 endif()
 
 if (NOT RTLSDR_FOUND)
