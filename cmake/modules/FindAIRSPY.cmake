@@ -17,8 +17,8 @@ if (NOT WIN32)
     pkg_check_modules(PC_AIRSPY QUIET AIRSPY)
 endif ()
 
-if (NOT LIBUSB_FOUND)
-    find_package(LIBUSB REQUIRED)
+if (NOT LibUSB_FOUND)
+    find_package(LibUSB REQUIRED)
 endif ()
 
 FIND_PATH(AIRSPY_INCLUDE_DIR

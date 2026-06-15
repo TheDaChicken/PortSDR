@@ -14,6 +14,10 @@ if (NOT WIN32)
     pkg_check_modules(PC_AIRSPYHF QUIET AIRSPYHF)
 endif ()
 
+if (NOT LibUSB_FOUND)
+    find_package(LibUSB REQUIRED)
+endif ()
+
 FIND_PATH(AIRSPYHF_INCLUDE_DIR
         NAMES airspy.h
         HINTS $ENV{AIRSPYHF_DIR}/include ${PC_AIRSPYHF_INCLUDEDIR}
